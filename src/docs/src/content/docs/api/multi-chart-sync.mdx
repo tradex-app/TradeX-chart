@@ -1,0 +1,384 @@
+---
+title: Multi-Chart Sync API
+description: API reference for synchronizing multiple charts
+---
+
+# Multi-Chart Sync API
+
+API reference for synchronizing multiple TradeX charts.
+
+## ChartSynchronizer
+
+### Constructor
+
+```typescript
+class ChartSynchronizer {
+  constructor(options?: SyncOptions)
+}
+
+interface SyncOptions {
+  syncCrosshair?: boolean
+  syncZoom?: boolean
+  syncScroll?: boolean
+  syncTimeRange?: boolean
+}
+```
+
+**Parameters:**
+- `options` (optional): Configuration options for synchronization
+
+**Example:**
+```javascript
+const sync = new ChartSynchronizer({
+  syncCrosshair: true,
+  syncZoom: true,
+  syncScroll: true
+})
+```
+
+### Methods
+
+#### addChart()
+
+Add a chart to the synchronization group.
+
+```typescript
+addChart(id: string, chart: TradeXChart, config?: ChartSyncConfig): void
+
+interface ChartSyncConfig {
+  syncCrosshair?: boolean
+  syncZoom?: boolean
+  syncScroll?: boolean
+  syncTimeRange?: boolean
+}
+```
+
+**Parameters:**
+- `id`: Unique identifier for the chart
+- `chart`: TradeX chart instance
+- `config` (optional): Chart-specific sync configuration
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+const chart1 = document.getElementById('chart1')
+const chart2 = document.getElementById('chart2')
+
+sync.addChart('btc', chart1)
+sync.addChart('eth', chart2, {
+  syncZoom: false // Don't sync zoom for this chart
+})
+```
+
+#### removeChart()
+
+Remove a chart from the synchronization group.
+
+```typescript
+removeChart(id: string): void
+```
+
+**Parameters:**
+- `id`: Chart identifier
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+sync.removeChart('btc')
+```
+
+#### toggleSync()
+
+Toggle a specific synchronization feature.
+
+```typescript
+toggleSync(type: 'Crosshair' | 'Zoom' | 'Scroll' | 'TimeRange'): void
+```
+
+**Parameters:**
+- `type`: Type of synchronization to toggle
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+sync.toggleSync('Zoom') // Disable zoom sync
+sync.toggleSync('Zoom') // Re-enable zoom sync
+```
+
+#### syncCrosshair()
+
+Manually trigger crosshair synchronization.
+
+```typescript
+syncCrosshair(sourceId: string, event: CrosshairEvent): void
+
+interface CrosshairEvent {
+  timestamp: number
+  price: number
+}
+```
+
+**Parameters:**
+- `sourceId`: ID of the source chart
+- `event`: Crosshair event data
+
+**Returns:** `void`
+
+#### syncZoom()
+
+Manually trigger zoom synchronization.
+
+```typescript
+syncZoom(sourceId: string, event: ZoomEvent): void
+
+interface ZoomEvent {
+  level: number
+}
+```
+
+**Parameters:**
+- `sourceId`: ID of the source chart
+- `event`: Zoom event data
+
+**Returns:** `void`
+
+#### syncScroll()
+
+Manually trigger scroll synchronization.
+
+```typescript
+syncScroll(sourceId: string, event: ScrollEvent): void
+
+interface ScrollEvent {
+  position: number
+}
+```
+
+**Parameters:**
+- `sourceId`: ID of the source chart
+- `event`: Scroll event data
+
+**Returns:** `void`
+
+## Events
+
+### crosshair
+
+Fired when crosshair position changes.
+
+```typescript
+chart.on('crosshair', (event: CrosshairEvent) => void)
+
+interface CrosshairEvent {
+  timestamp: number
+  price: number
+  x: number
+  y: number
+}
+```
+
+**Example:**
+```javascript
+chart.on('crosshair', (event) => {
+  console.log('Crosshair at:', event.timestamp, event.price)
+})
+```
+
+### zoom
+
+Fired when zoom level changes.
+
+```typescript
+chart.on('zoom', (event: ZoomEvent) => void)
+
+interface ZoomEvent {
+  level: number
+  scale: number
+}
+```
+
+**Example:**
+```javascript
+chart.on('zoom', (event) => {
+  console.log('Zoom level:', event.level)
+})
+```
+
+### scroll
+
+Fired when chart is scrolled.
+
+```typescript
+chart.on('scroll', (event: ScrollEvent) => void)
+
+interface ScrollEvent {
+  position: number
+  offset: number
+}
+```
+
+**Example:**
+```javascript
+chart.on('scroll', (event) => {
+  console.log('Scroll position:', event.position)
+})
+```
+
+### timeRangeChange
+
+Fired when visible time range changes.
+
+```typescript
+chart.on('timeRangeChange', (event: TimeRangeEvent) => void)
+
+interface TimeRangeEvent {
+  start: number
+  end: number
+}
+```
+
+**Example:**
+```javascript
+chart.on('timeRangeChange', (event) => {
+  console.log('Time range:', event.start, event.end)
+})
+```
+
+## Chart Methods
+
+### setCrosshair()
+
+Set crosshair position programmatically.
+
+```typescript
+chart.setCrosshair(timestamp: number, price: number): void
+```
+
+**Parameters:**
+- `timestamp`: Unix timestamp in milliseconds
+- `price`: Price value
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+chart.setCrosshair(1609459200000, 45000)
+```
+
+### setZoom()
+
+Set zoom level programmatically.
+
+```typescript
+chart.setZoom(level: number): void
+```
+
+**Parameters:**
+- `level`: Zoom level (1.0 = 100%)
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+chart.setZoom(1.5) // 150% zoom
+```
+
+### scrollTo()
+
+Scroll to a specific position.
+
+```typescript
+chart.scrollTo(position: number): void
+```
+
+**Parameters:**
+- `position`: Scroll position (0-1)
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+chart.scrollTo(0.5) // Scroll to middle
+```
+
+### setTimeRange()
+
+Set visible time range.
+
+```typescript
+chart.setTimeRange(start: number, end: number): void
+```
+
+**Parameters:**
+- `start`: Start timestamp
+- `end`: End timestamp
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+const start = Date.now() - 24 * 60 * 60 * 1000 // 24 hours ago
+const end = Date.now()
+chart.setTimeRange(start, end)
+```
+
+## TypeScript Definitions
+
+```typescript
+declare module 'tradex-chart' {
+  export class ChartSynchronizer {
+    constructor(options?: SyncOptions)
+    addChart(id: string, chart: TradeXChart, config?: ChartSyncConfig): void
+    removeChart(id: string): void
+    toggleSync(type: 'Crosshair' | 'Zoom' | 'Scroll' | 'TimeRange'): void
+    syncCrosshair(sourceId: string, event: CrosshairEvent): void
+    syncZoom(sourceId: string, event: ZoomEvent): void
+    syncScroll(sourceId: string, event: ScrollEvent): void
+  }
+
+  export interface SyncOptions {
+    syncCrosshair?: boolean
+    syncZoom?: boolean
+    syncScroll?: boolean
+    syncTimeRange?: boolean
+  }
+
+  export interface ChartSyncConfig {
+    syncCrosshair?: boolean
+    syncZoom?: boolean
+    syncScroll?: boolean
+    syncTimeRange?: boolean
+  }
+
+  export interface CrosshairEvent {
+    timestamp: number
+    price: number
+    x: number
+    y: number
+  }
+
+  export interface ZoomEvent {
+    level: number
+    scale: number
+  }
+
+  export interface ScrollEvent {
+    position: number
+    offset: number
+  }
+
+  export interface TimeRangeEvent {
+    start: number
+    end: number
+  }
+}
+```
+
+## Related Documentation
+
+- [Example](../examples/multi-chart-sync) - Multi-chart sync example
+- [Events](../reference/events) - Event reference
+- [Configuration](../reference/02_configuration) - Chart configuration

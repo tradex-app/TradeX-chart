@@ -1,0 +1,550 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-has-toc data-has-sidebar class="astro-bguv2lll"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>Library Comparison | TradeX Chart</title><link rel="canonical"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v3.3.0"/><meta name="generator" content="Starlight v0.11.1"/><meta property="og:title" content="Library Comparison"/><meta property="og:type" content="article"/><meta property="og:url"/><meta property="og:locale" content="en"/><meta property="og:description" content="How TradeX Chart compares to other charting solutions"/><meta property="og:site_name" content="TradeX Chart"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="Library Comparison"/><meta name="twitter:description" content="How TradeX Chart compares to other charting solutions"/><meta name="description" content="How TradeX Chart compares to other charting solutions"/><script>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/_astro/index.88731c60.css" />
+<style>svg:where(.astro-c6vsoqas){color:var(--sl-icon-color);font-size:var(--sl-icon-size, 1em);width:1em;height:1em}
+</style><script type="module" src="/_astro/hoisted.dbfb2330.js"></script></head><body class="astro-bguv2lll"><a href="#_top" class="astro-7q3lir66">Skip to content</a><div class="page sl-flex astro-vrdttmbt"><header class="header astro-vrdttmbt"><div class="header sl-flex astro-kmkmnagf"><div class="sl-flex astro-kmkmnagf"><a href="/" class="site-title sl-flex astro-m46x6ez3"><img class="astro-m46x6ez3" alt="" src="/_astro/tx.82979636.svg" width="48" height="48"><span class="astro-m46x6ez3">TradeX Chart</span></a></div><div class="sl-flex astro-kmkmnagf"><site-search data-translations="{&#34;placeholder&#34;:&#34;Search&#34;}" class="astro-v37mnknz"><button data-open-modal disabled class="astro-v37mnknz"><svg aria-label="Search" class="astro-v37mnknz astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg><span class="sl-hidden md:sl-block astro-v37mnknz" aria-hidden="true">Search</span><svg aria-label="(Press / to Search)" class="sl-hidden md:sl-block astro-v37mnknz astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 2H7a5 5 0 0 0-5 5v10a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5V7a5 5 0 0 0-5-5Zm3 15a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v10Z"/><path d="M15.293 6.707a1 1 0 1 1 1.414 1.414l-8.485 8.486a1 1 0 0 1-1.414-1.415l8.485-8.485Z"/></svg></button><dialog style="padding:0" aria-label="Search" class="astro-v37mnknz"><div class="dialog-frame sl-flex astro-v37mnknz"><button data-close-modal class="sl-flex md:sl-hidden astro-v37mnknz">Cancel</button><div class="search-container astro-v37mnknz"><div id="starlight__search" class="astro-v37mnknz"></div></div></div></dialog></site-search></div><div class="sl-hidden md:sl-flex right-group astro-kmkmnagf"><div class="sl-flex social-icons astro-kmkmnagf"><a href="https://github.com/tradex-app/TradeX-chart" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">GitHub</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a><a href="https://discord.com/channels/1039287962510311434/1039288750913634405" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Discord</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M20.32 4.37a19.8 19.8 0 0 0-4.93-1.51 13.78 13.78 0 0 0-.64 1.28 18.27 18.27 0 0 0-5.5 0 12.64 12.64 0 0 0-.64-1.28h-.05A19.74 19.74 0 0 0 3.64 4.4 20.26 20.26 0 0 0 .11 18.09l.02.02a19.9 19.9 0 0 0 6.04 3.03l.04-.02a14.24 14.24 0 0 0 1.23-2.03.08.08 0 0 0-.05-.07 13.1 13.1 0 0 1-1.9-.92.08.08 0 0 1 .02-.1 10.2 10.2 0 0 0 .41-.31h.04a14.2 14.2 0 0 0 12.1 0l.04.01a9.63 9.63 0 0 0 .4.32.08.08 0 0 1-.03.1 12.29 12.29 0 0 1-1.9.91.08.08 0 0 0-.02.1 15.97 15.97 0 0 0 1.27 2.01h.04a19.84 19.84 0 0 0 6.03-3.05v-.03a20.12 20.12 0 0 0-3.57-13.69ZM8.02 15.33c-1.18 0-2.16-1.08-2.16-2.42 0-1.33.96-2.42 2.16-2.42 1.21 0 2.18 1.1 2.16 2.42 0 1.34-.96 2.42-2.16 2.42Zm7.97 0c-1.18 0-2.15-1.08-2.15-2.42 0-1.33.95-2.42 2.15-2.42 1.22 0 2.18 1.1 2.16 2.42 0 1.34-.94 2.42-2.16 2.42Z"/></svg></a></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-4yphtoen"><span class="sr-only astro-4yphtoen">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select value="auto" class="astro-4yphtoen"><option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected="true" class="astro-4yphtoen">Auto</option></select><svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select><script>
+	StarlightThemeProvider.updatePickers();
+</script></div></div></header><nav class="sidebar astro-vrdttmbt" aria-label="Main"><starlight-menu-button class="astro-jif73yzw"><button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-jif73yzw"><svg aria-hidden="true" class="astro-jif73yzw astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg></button></starlight-menu-button><div id="starlight__sidebar" class="sidebar-pane astro-vrdttmbt"><div class="sidebar-content sl-flex astro-vrdttmbt"><ul class="top-level astro-3ii7xxms"><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">Examples</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/examples/01_static_chart/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Static Price History</span></a></li><li class="astro-3ii7xxms"><a href="/examples/02_live_history_chart/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Pice History with Live Price Feed</span></a></li><li class="astro-3ii7xxms"><a href="/examples/custom_indicator/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Indicator</span></a></li><li class="astro-3ii7xxms"><a href="/examples/custom-drawing-tools/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Drawing Tools</span></a></li><li class="astro-3ii7xxms"><a href="/examples/custom-theme-builder/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Theme Builder</span></a></li><li class="astro-3ii7xxms"><a href="/examples/export-chart-image/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Export Chart Image</span></a></li><li class="astro-3ii7xxms"><a href="/examples/features/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Chart Features</span></a></li><li class="astro-3ii7xxms"><a href="/examples/indicator-alerts/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Indicator Alerts</span></a></li><li class="astro-3ii7xxms"><a href="/examples/mobile-responsive/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Mobile Responsive</span></a></li><li class="astro-3ii7xxms"><a href="/examples/multi-chart-sync/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Multi-Chart Synchronization</span></a></li><li class="astro-3ii7xxms"><a href="/examples/real-time-websocket/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Real-Time WebSocket</span></a></li><li class="astro-3ii7xxms"><a href="/examples/static_chart/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Static Price History</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">Guides</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">backend</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/guides/backend/data-caching-strategies/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Data Caching Strategies</span></a></li><li class="astro-3ii7xxms"><a href="/guides/backend/graphql-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">GraphQL Integration</span></a></li><li class="astro-3ii7xxms"><a href="/guides/backend/rest-api-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">REST API Integration</span></a></li><li class="astro-3ii7xxms"><a href="/guides/backend/websocket-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">WebSocket Integration</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">deployment</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/guides/deployment/cdn-deployment/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">CDN Deployment</span></a></li><li class="astro-3ii7xxms"><a href="/guides/deployment/production-checklist/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Production Checklist</span></a></li><li class="astro-3ii7xxms"><a href="/guides/deployment/security-considerations/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Security Considerations</span></a></li><li class="astro-3ii7xxms"><a href="/guides/deployment/vite-config/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Vite Configuration</span></a></li><li class="astro-3ii7xxms"><a href="/guides/deployment/webpack-config/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Webpack Configuration</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">development</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/guides/development/build-process/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Build Process</span></a></li><li class="astro-3ii7xxms"><a href="/guides/development/contributing-code/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Contributing Code</span></a></li><li class="astro-3ii7xxms"><a href="/guides/development/debugging-tips/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Debugging Tips</span></a></li><li class="astro-3ii7xxms"><a href="/guides/development/local-setup/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Local Development Setup</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">framework-integration</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/guides/framework-integration/angular-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Angular Integration</span></a></li><li class="astro-3ii7xxms"><a href="/guides/framework-integration/nextjs-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Next.js Integration</span></a></li><li class="astro-3ii7xxms"><a href="/guides/framework-integration/react-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">React Integration</span></a></li><li class="astro-3ii7xxms"><a href="/guides/framework-integration/svelte-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Svelte Integration</span></a></li><li class="astro-3ii7xxms"><a href="/guides/framework-integration/vue-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Vue Integration</span></a></li></ul></details></li><li class="astro-3ii7xxms"><a href="/guides/accessibility/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Accessibility</span></a></li><li class="astro-3ii7xxms"><a href="/guides/comparison/" aria-current="page" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Library Comparison</span></a></li><li class="astro-3ii7xxms"><a href="/guides/contributing/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Contributing to TradeX Chart</span></a></li><li class="astro-3ii7xxms"><a href="/guides/custom_indicator/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Indicator - How to Build and Use</span></a></li><li class="astro-3ii7xxms"><a href="/guides/data-management/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Data Management</span></a></li><li class="astro-3ii7xxms"><a href="/guides/faq/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Frequently Asked Questions</span></a></li><li class="astro-3ii7xxms"><a href="/guides/howto/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">How To</span></a></li><li class="astro-3ii7xxms"><a href="/guides/i18n/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Internationalization (i18n)</span></a></li><li class="astro-3ii7xxms"><a href="/guides/known_bugs_issues/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Known Bugs Issues and Fixes</span></a></li><li class="astro-3ii7xxms"><a href="/guides/performance/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Performance Optimization</span></a></li><li class="astro-3ii7xxms"><a href="/guides/repurpose_indicators/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Repurpose Indicators</span></a></li><li class="astro-3ii7xxms"><a href="/guides/test/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Test</span></a></li><li class="astro-3ii7xxms"><a href="/guides/testing/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Testing</span></a></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">recipes</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/guides/recipes/add-custom-buttons/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Add Custom Buttons</span></a></li><li class="astro-3ii7xxms"><a href="/guides/recipes/change-colors-dynamically/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Change Colors Dynamically</span></a></li><li class="astro-3ii7xxms"><a href="/guides/recipes/custom-tooltips/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Tooltips</span></a></li><li class="astro-3ii7xxms"><a href="/guides/recipes/keyboard-shortcuts/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Keyboard Shortcuts</span></a></li><li class="astro-3ii7xxms"><a href="/guides/recipes/multi-language-support/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Multi-Language Support</span></a></li><li class="astro-3ii7xxms"><a href="/guides/recipes/save-restore-chart-state/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Save &amp; Restore Chart State</span></a></li></ul></details></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">Reference</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/reference/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Introduction</span></a></li><li class="astro-3ii7xxms"><a href="/reference/00_introduction/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Introduction</span></a></li><li class="astro-3ii7xxms"><a href="/reference/01_getting_started/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Getting Started</span></a></li><li class="astro-3ii7xxms"><a href="/reference/02_configuration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Configuration</span></a></li><li class="astro-3ii7xxms"><a href="/reference/annotations/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Annotations</span></a></li><li class="astro-3ii7xxms"><a href="/reference/api-examples/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">API Examples</span></a></li><li class="astro-3ii7xxms"><a href="/reference/architecture/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Architecture</span></a></li><li class="astro-3ii7xxms"><a href="/reference/canvas_extension_layers/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Canvas Extension Layers</span></a></li><li class="astro-3ii7xxms"><a href="/reference/canvas_methods/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Canvas Methods</span></a></li><li class="astro-3ii7xxms"><a href="/reference/changelog/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Changelog</span></a></li><li class="astro-3ii7xxms"><a href="/reference/datasource/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Data Source</span></a></li><li class="astro-3ii7xxms"><a href="/reference/events/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Events</span></a></li><li class="astro-3ii7xxms"><a href="/reference/example/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Example Reference</span></a></li><li class="astro-3ii7xxms"><a href="/reference/glossary/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Glossary</span></a></li><li class="astro-3ii7xxms"><a href="/reference/hit_detection/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Hit Detection</span></a></li><li class="astro-3ii7xxms"><a href="/reference/indicators/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Indicators</span></a></li><li class="astro-3ii7xxms"><a href="/reference/indicators_custom/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Indicators</span></a></li><li class="astro-3ii7xxms"><a href="/reference/indicators_default/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Default Indicators</span></a></li><li class="astro-3ii7xxms"><a href="/reference/indicators_talib/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">TA-Lib Functions</span></a></li><li class="astro-3ii7xxms"><a href="/reference/legends/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Legends</span></a></li><li class="astro-3ii7xxms"><a href="/reference/overlays/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Overlays</span></a></li><li class="astro-3ii7xxms"><a href="/reference/overlays_custom/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Overlays</span></a></li><li class="astro-3ii7xxms"><a href="/reference/overlays_news_events/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Overlay News Events</span></a></li><li class="astro-3ii7xxms"><a href="/reference/overlays_trades/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Overlay Trades</span></a></li><li class="astro-3ii7xxms"><a href="/reference/range/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Range</span></a></li><li class="astro-3ii7xxms"><a href="/reference/state/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">State</span></a></li><li class="astro-3ii7xxms"><a href="/reference/state_machine/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">State Machine</span></a></li><li class="astro-3ii7xxms"><a href="/reference/streaming_price_data/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Streaming Price Data to the Chart</span></a></li><li class="astro-3ii7xxms"><a href="/reference/themes/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Themes</span></a></li><li class="astro-3ii7xxms"><a href="/reference/web_workers/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Web Workers</span></a></li><li class="astro-3ii7xxms"><a href="/reference/widgets/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Widgets</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">API</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/api/core/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">core</span></a></li><li class="astro-3ii7xxms"><a href="/api/core-old/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">core - documentation.js</span></a></li><li class="astro-3ii7xxms"><a href="/api/core2/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">core</span></a></li><li class="astro-3ii7xxms"><a href="/api/custom-drawing-tools/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Drawing Tools API</span></a></li><li class="astro-3ii7xxms"><a href="/api/custom-theme-builder/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Theme Builder API</span></a></li><li class="astro-3ii7xxms"><a href="/api/export-chart-image/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Export Chart Image API</span></a></li><li class="astro-3ii7xxms"><a href="/api/indicator-alerts/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Indicator Alerts API</span></a></li><li class="astro-3ii7xxms"><a href="/api/mobile-responsive/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Mobile Responsive API</span></a></li><li class="astro-3ii7xxms"><a href="/api/multi-chart-sync/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Multi-Chart Sync API</span></a></li><li class="astro-3ii7xxms"><a href="/api/real-time-websocket/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Real-Time WebSocket API</span></a></li></ul></details></li></ul><div class="md:sl-hidden"><div class="mobile-preferences sl-flex astro-wu23bvmt"><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-4yphtoen"><span class="sr-only astro-4yphtoen">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select value="auto" class="astro-4yphtoen"><option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected="true" class="astro-4yphtoen">Auto</option></select><svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select><script>
+	StarlightThemeProvider.updatePickers();
+</script></div></div></div></div></nav><div class="main-frame astro-vrdttmbt"><div class="lg:sl-flex astro-67yu43on"><aside class="right-sidebar-container astro-67yu43on"><div class="right-sidebar astro-67yu43on"><div class="lg:sl-hidden astro-pb3aqygn"><mobile-starlight-toc data-min-h="2" data-max-h="4" class="astro-doynk5tl"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-doynk5tl"><details id="starlight__mobile-toc" class="astro-doynk5tl"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-doynk5tl"><div class="toggle sl-flex astro-doynk5tl">On this page<svg aria-hidden="true" class="caret astro-doynk5tl astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></div><span class="display-current astro-doynk5tl"></span></summary><div class="dropdown astro-doynk5tl"><ul class="isMobile astro-g2bywc46" style="--depth: 0;"><li class="astro-g2bywc46" style="--depth: 0;"><a href="#_top" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Overview</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#quick-comparison-table" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Quick Comparison Table</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#detailed-comparisons" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Detailed Comparisons</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradex-chart-vs-tradingview" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeX Chart vs TradingView</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 2;"><li class="astro-g2bywc46" style="--depth: 2;"><a href="#tradingview-advantages" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">TradingView Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#tradex-chart-advantages" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">TradeX Chart Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-tradingview" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose TradingView</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-tradex-chart" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose TradeX Chart</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradex-chart-vs-lightweight-charts" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeX Chart vs Lightweight Charts</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 2;"><li class="astro-g2bywc46" style="--depth: 2;"><a href="#lightweight-charts-advantages" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">Lightweight Charts Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#tradex-chart-advantages-1" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">TradeX Chart Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-lightweight-charts" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose Lightweight Charts</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-tradex-chart-1" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose TradeX Chart</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradex-chart-vs-chartjs" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeX Chart vs Chart.js</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 2;"><li class="astro-g2bywc46" style="--depth: 2;"><a href="#chartjs-advantages" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">Chart.js Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#tradex-chart-advantages-2" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">TradeX Chart Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-chartjs" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose Chart.js</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-tradex-chart-2" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose TradeX Chart</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradex-chart-vs-d3js" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeX Chart vs D3.js</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 2;"><li class="astro-g2bywc46" style="--depth: 2;"><a href="#d3js-advantages" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">D3.js Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#tradex-chart-advantages-3" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">TradeX Chart Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-d3js" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose D3.js</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-tradex-chart-3" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose TradeX Chart</span></a></li></ul></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#feature-deep-dive" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Feature Deep Dive</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#technical-indicators" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Technical Indicators</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#drawing-tools" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Drawing Tools</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#performance-comparison" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Performance Comparison</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#customization-levels" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Customization Levels</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#use-case-recommendations" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Use Case Recommendations</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#choose-tradex-chart-if-youre-building" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Choose TradeX Chart if you’re building:</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#choose-tradingview-if-youre-building" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Choose TradingView if you’re building:</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#choose-lightweight-charts-if-youre-building" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Choose Lightweight Charts if you’re building:</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#choose-chartjs-if-youre-building" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Choose Chart.js if you’re building:</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#choose-d3js-if-youre-building" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Choose D3.js if you’re building:</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#migration-considerations" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Migration Considerations</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#from-tradingview-to-tradex-chart" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">From TradingView to TradeX Chart</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#from-lightweight-charts-to-tradex-chart" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">From Lightweight Charts to TradeX Chart</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#from-chartjs-to-tradex-chart" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">From Chart.js to TradeX Chart</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#cost-analysis" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Cost Analysis</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradex-chart" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeX Chart</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradingview" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradingView</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#lightweight-charts" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Lightweight Charts</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#conclusion" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Conclusion</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#further-reading" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Further Reading</span></a></li></ul></div></details></nav></mobile-starlight-toc></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-pb3aqygn"><div class="sl-container astro-pb3aqygn"><starlight-toc data-min-h="2" data-max-h="4"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-g2bywc46" style="--depth: 0;"><li class="astro-g2bywc46" style="--depth: 0;"><a href="#_top" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Overview</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#quick-comparison-table" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Quick Comparison Table</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#detailed-comparisons" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Detailed Comparisons</span></a><ul class="astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradex-chart-vs-tradingview" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeX Chart vs TradingView</span></a><ul class="astro-g2bywc46" style="--depth: 2;"><li class="astro-g2bywc46" style="--depth: 2;"><a href="#tradingview-advantages" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">TradingView Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#tradex-chart-advantages" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">TradeX Chart Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-tradingview" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose TradingView</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-tradex-chart" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose TradeX Chart</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradex-chart-vs-lightweight-charts" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeX Chart vs Lightweight Charts</span></a><ul class="astro-g2bywc46" style="--depth: 2;"><li class="astro-g2bywc46" style="--depth: 2;"><a href="#lightweight-charts-advantages" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">Lightweight Charts Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#tradex-chart-advantages-1" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">TradeX Chart Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-lightweight-charts" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose Lightweight Charts</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-tradex-chart-1" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose TradeX Chart</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradex-chart-vs-chartjs" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeX Chart vs Chart.js</span></a><ul class="astro-g2bywc46" style="--depth: 2;"><li class="astro-g2bywc46" style="--depth: 2;"><a href="#chartjs-advantages" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">Chart.js Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#tradex-chart-advantages-2" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">TradeX Chart Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-chartjs" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose Chart.js</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-tradex-chart-2" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose TradeX Chart</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradex-chart-vs-d3js" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeX Chart vs D3.js</span></a><ul class="astro-g2bywc46" style="--depth: 2;"><li class="astro-g2bywc46" style="--depth: 2;"><a href="#d3js-advantages" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">D3.js Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#tradex-chart-advantages-3" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">TradeX Chart Advantages</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-d3js" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose D3.js</span></a></li><li class="astro-g2bywc46" style="--depth: 2;"><a href="#when-to-choose-tradex-chart-3" class="astro-g2bywc46" style="--depth: 2;"><span class="astro-g2bywc46" style="--depth: 2;">When to Choose TradeX Chart</span></a></li></ul></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#feature-deep-dive" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Feature Deep Dive</span></a><ul class="astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#technical-indicators" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Technical Indicators</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#drawing-tools" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Drawing Tools</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#performance-comparison" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Performance Comparison</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#customization-levels" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Customization Levels</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#use-case-recommendations" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Use Case Recommendations</span></a><ul class="astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#choose-tradex-chart-if-youre-building" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Choose TradeX Chart if you’re building:</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#choose-tradingview-if-youre-building" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Choose TradingView if you’re building:</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#choose-lightweight-charts-if-youre-building" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Choose Lightweight Charts if you’re building:</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#choose-chartjs-if-youre-building" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Choose Chart.js if you’re building:</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#choose-d3js-if-youre-building" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Choose D3.js if you’re building:</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#migration-considerations" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Migration Considerations</span></a><ul class="astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#from-tradingview-to-tradex-chart" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">From TradingView to TradeX Chart</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#from-lightweight-charts-to-tradex-chart" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">From Lightweight Charts to TradeX Chart</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#from-chartjs-to-tradex-chart" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">From Chart.js to TradeX Chart</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#cost-analysis" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Cost Analysis</span></a><ul class="astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradex-chart" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradeX Chart</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#tradingview" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">TradingView</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#lightweight-charts" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">Lightweight Charts</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#conclusion" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Conclusion</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#further-reading" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Further Reading</span></a></li></ul></nav></starlight-toc></div></div></div></aside><div class="main-pane astro-67yu43on"><main data-pagefind-body lang="en" dir="ltr" class="astro-bguv2lll"><div class="content-panel astro-7nkwcw3z"><div class="sl-container astro-7nkwcw3z"><h1 id="_top" class="astro-j6tvhyss">Library Comparison</h1></div></div><div class="content-panel astro-7nkwcw3z"><div class="sl-container astro-7nkwcw3z"><div class="content astro-ml6ntd6l"><h1 id="tradex-chart-vs-other-charting-libraries">TradeX Chart vs Other Charting Libraries</h1>
+<p>This guide helps you understand how TradeX Chart compares to other popular financial charting libraries and when to choose each solution.</p>
+<h2 id="quick-comparison-table">Quick Comparison Table</h2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Feature</th><th>TradeX Chart</th><th>TradingView</th><th>Lightweight Charts</th><th>Chart.js</th><th>D3.js</th></tr></thead><tbody><tr><td><strong>License</strong></td><td>GNU GPL3</td><td>Proprietary</td><td>Apache 2.0</td><td>MIT</td><td>ISC</td></tr><tr><td><strong>Cost</strong></td><td>Free</td><td>Paid plans</td><td>Free</td><td>Free</td><td>Free</td></tr><tr><td><strong>Dependencies</strong></td><td>1 (mjolnir.js)</td><td>Many</td><td>0</td><td>0</td><td>0</td></tr><tr><td><strong>Framework</strong></td><td>Vanilla JS</td><td>Proprietary</td><td>Vanilla JS</td><td>Vanilla JS</td><td>Vanilla JS</td></tr><tr><td><strong>Bundle Size</strong></td><td>~500KB</td><td>N/A (hosted)</td><td>~50KB</td><td>~200KB</td><td>~250KB</td></tr><tr><td><strong>TypeScript</strong></td><td>✅ Types included</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td><strong>Customization</strong></td><td>High</td><td>Limited</td><td>Medium</td><td>High</td><td>Very High</td></tr><tr><td><strong>Learning Curve</strong></td><td>Medium</td><td>Low</td><td>Low</td><td>Low</td><td>High</td></tr><tr><td><strong>Technical Indicators</strong></td><td>100+ (TALib)</td><td>100+</td><td>Limited</td><td>None</td><td>DIY</td></tr><tr><td><strong>Drawing Tools</strong></td><td>✅</td><td>✅</td><td>❌</td><td>❌</td><td>DIY</td></tr><tr><td><strong>Real-time Data</strong></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>DIY</td></tr><tr><td><strong>Mobile Support</strong></td><td>✅</td><td>✅</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td><strong>Self-hosted</strong></td><td>✅</td><td>❌</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td><strong>Custom Overlays</strong></td><td>✅</td><td>Limited</td><td>Limited</td><td>✅</td><td>✅</td></tr><tr><td><strong>Themes</strong></td><td>✅ Full control</td><td>Limited</td><td>✅</td><td>✅</td><td>✅</td></tr><tr><td><strong>Best For</strong></td><td>Trading apps</td><td>Quick embed</td><td>Lightweight apps</td><td>General charts</td><td>Custom viz</td></tr></tbody></table>
+<h2 id="detailed-comparisons">Detailed Comparisons</h2>
+<h3 id="tradex-chart-vs-tradingview">TradeX Chart vs TradingView</h3>
+<h4 id="tradingview-advantages">TradingView Advantages</h4>
+<ul>
+<li><strong>Ecosystem</strong>: Massive community, social features, and shared scripts</li>
+<li><strong>Ease of use</strong>: Drop-in widget with minimal configuration</li>
+<li><strong>Professional tools</strong>: Industry-standard charting tools</li>
+<li><strong>No maintenance</strong>: Fully hosted solution</li>
+<li><strong>Mobile apps</strong>: Native iOS and Android apps</li>
+</ul>
+<h4 id="tradex-chart-advantages">TradeX Chart Advantages</h4>
+<ul>
+<li><strong>Cost</strong>: Completely free and open source</li>
+<li><strong>Self-hosted</strong>: Full control over your data and infrastructure</li>
+<li><strong>Customization</strong>: Complete control over appearance and behavior</li>
+<li><strong>No vendor lock-in</strong>: Own your implementation</li>
+<li><strong>Privacy</strong>: No data sent to third parties</li>
+<li><strong>Extensibility</strong>: Build custom indicators and overlays</li>
+<li><strong>Integration</strong>: Easier to integrate with existing systems</li>
+</ul>
+<h4 id="when-to-choose-tradingview">When to Choose TradingView</h4>
+<ul>
+<li>You need a quick, professional solution</li>
+<li>You want social trading features</li>
+<li>You don’t mind recurring costs</li>
+<li>You prefer hosted solutions</li>
+</ul>
+<h4 id="when-to-choose-tradex-chart">When to Choose TradeX Chart</h4>
+<ul>
+<li>You need full control and customization</li>
+<li>You want to self-host</li>
+<li>You’re building a proprietary trading platform</li>
+<li>You need to integrate deeply with your backend</li>
+<li>You want to avoid licensing costs</li>
+</ul>
+<hr>
+<h3 id="tradex-chart-vs-lightweight-charts">TradeX Chart vs Lightweight Charts</h3>
+<h4 id="lightweight-charts-advantages">Lightweight Charts Advantages</h4>
+<ul>
+<li><strong>Size</strong>: Much smaller bundle (~50KB vs ~500KB)</li>
+<li><strong>Performance</strong>: Optimized for speed</li>
+<li><strong>Simplicity</strong>: Minimal API, easy to learn</li>
+<li><strong>Zero dependencies</strong>: No external libraries</li>
+<li><strong>Mobile-first</strong>: Excellent mobile performance</li>
+</ul>
+<h4 id="tradex-chart-advantages-1">TradeX Chart Advantages</h4>
+<ul>
+<li><strong>Features</strong>: More built-in indicators (100+ via TALib)</li>
+<li><strong>Drawing tools</strong>: Full suite of drawing tools</li>
+<li><strong>Customization</strong>: More extensive theming options</li>
+<li><strong>Overlays</strong>: More flexible overlay system</li>
+<li><strong>Chart types</strong>: More candle types and visualization options</li>
+<li><strong>State management</strong>: Built-in state export/import</li>
+<li><strong>Web Workers</strong>: Built-in support for offloading calculations</li>
+</ul>
+<h4 id="when-to-choose-lightweight-charts">When to Choose Lightweight Charts</h4>
+<ul>
+<li>Bundle size is critical</li>
+<li>You need simple price charts</li>
+<li>You want minimal dependencies</li>
+<li>Performance is the top priority</li>
+<li>You don’t need drawing tools</li>
+</ul>
+<h4 id="when-to-choose-tradex-chart-1">When to Choose TradeX Chart</h4>
+<ul>
+<li>You need technical indicators</li>
+<li>You need drawing tools</li>
+<li>You want more customization options</li>
+<li>You need complex overlays</li>
+<li>You’re building a full-featured trading platform</li>
+</ul>
+<hr>
+<h3 id="tradex-chart-vs-chartjs">TradeX Chart vs Chart.js</h3>
+<h4 id="chartjs-advantages">Chart.js Advantages</h4>
+<ul>
+<li><strong>Versatility</strong>: Supports many chart types (bar, line, pie, radar, etc.)</li>
+<li><strong>Simplicity</strong>: Very easy to get started</li>
+<li><strong>Documentation</strong>: Excellent documentation</li>
+<li><strong>Community</strong>: Large community and ecosystem</li>
+<li><strong>Animations</strong>: Smooth built-in animations</li>
+<li><strong>Responsive</strong>: Automatic responsive behavior</li>
+</ul>
+<h4 id="tradex-chart-advantages-2">TradeX Chart Advantages</h4>
+<ul>
+<li><strong>Financial focus</strong>: Built specifically for financial data</li>
+<li><strong>OHLCV support</strong>: Native candlestick and OHLCV support</li>
+<li><strong>Technical indicators</strong>: 100+ built-in indicators</li>
+<li><strong>Time-series</strong>: Optimized for time-series data</li>
+<li><strong>Drawing tools</strong>: Interactive drawing tools</li>
+<li><strong>Real-time</strong>: Better real-time data handling</li>
+<li><strong>Zoom/Pan</strong>: Advanced zoom and pan controls</li>
+</ul>
+<h4 id="when-to-choose-chartjs">When to Choose Chart.js</h4>
+<ul>
+<li>You need various chart types (pie, bar, radar, etc.)</li>
+<li>You’re building general data visualization</li>
+<li>You want simple, quick charts</li>
+<li>You don’t need financial-specific features</li>
+</ul>
+<h4 id="when-to-choose-tradex-chart-2">When to Choose TradeX Chart</h4>
+<ul>
+<li>You’re building financial/trading applications</li>
+<li>You need candlestick charts</li>
+<li>You need technical indicators</li>
+<li>You need drawing tools</li>
+<li>You’re working with time-series financial data</li>
+</ul>
+<hr>
+<h3 id="tradex-chart-vs-d3js">TradeX Chart vs D3.js</h3>
+<h4 id="d3js-advantages">D3.js Advantages</h4>
+<ul>
+<li><strong>Flexibility</strong>: Unlimited customization possibilities</li>
+<li><strong>Visualization types</strong>: Can create any visualization</li>
+<li><strong>Data binding</strong>: Powerful data-driven approach</li>
+<li><strong>Community</strong>: Huge ecosystem of examples</li>
+<li><strong>SVG control</strong>: Direct SVG manipulation</li>
+<li><strong>Transitions</strong>: Sophisticated animation system</li>
+</ul>
+<h4 id="tradex-chart-advantages-3">TradeX Chart Advantages</h4>
+<ul>
+<li><strong>Ready-to-use</strong>: Pre-built financial chart components</li>
+<li><strong>Learning curve</strong>: Much easier to get started</li>
+<li><strong>Performance</strong>: Optimized for financial charts</li>
+<li><strong>Maintenance</strong>: Less code to maintain</li>
+<li><strong>Built-in features</strong>: Indicators, drawing tools included</li>
+<li><strong>Time to market</strong>: Much faster implementation</li>
+</ul>
+<h4 id="when-to-choose-d3js">When to Choose D3.js</h4>
+<ul>
+<li>You need complete creative control</li>
+<li>You’re building unique visualizations</li>
+<li>You have D3.js expertise</li>
+<li>You need non-standard chart types</li>
+<li>You want to build everything from scratch</li>
+</ul>
+<h4 id="when-to-choose-tradex-chart-3">When to Choose TradeX Chart</h4>
+<ul>
+<li>You need financial charts quickly</li>
+<li>You want pre-built components</li>
+<li>You prefer higher-level APIs</li>
+<li>You need standard financial features</li>
+<li>You want to focus on business logic, not charting internals</li>
+</ul>
+<hr>
+<h2 id="feature-deep-dive">Feature Deep Dive</h2>
+<h3 id="technical-indicators">Technical Indicators</h3>
+<p><strong>TradeX Chart</strong>: 100+ indicators via TALib WebAssembly</p>
+<ul>
+<li>Moving Averages (SMA, EMA, WMA, etc.)</li>
+<li>Oscillators (RSI, MACD, Stochastic, etc.)</li>
+<li>Volatility (Bollinger Bands, ATR, etc.)</li>
+<li>Volume indicators</li>
+<li>Custom indicators supported</li>
+</ul>
+<p><strong>TradingView</strong>: 100+ built-in indicators</p>
+<ul>
+<li>Similar coverage to TradeX</li>
+<li>Pine Script for custom indicators</li>
+<li>Community-shared indicators</li>
+</ul>
+<p><strong>Lightweight Charts</strong>: Limited built-in indicators</p>
+<ul>
+<li>Basic moving averages</li>
+<li>Volume</li>
+<li>Custom indicators require manual implementation</li>
+</ul>
+<p><strong>Chart.js</strong>: No built-in financial indicators</p>
+<ul>
+<li>Must implement manually or use plugins</li>
+</ul>
+<p><strong>D3.js</strong>: No built-in indicators</p>
+<ul>
+<li>Complete DIY implementation</li>
+</ul>
+<h3 id="drawing-tools">Drawing Tools</h3>
+<p><strong>TradeX Chart</strong>: ✅ Full suite</p>
+<ul>
+<li>Trend lines, channels, Fibonacci retracements</li>
+<li>Shapes, text annotations</li>
+<li>Custom drawing tools supported</li>
+</ul>
+<p><strong>TradingView</strong>: ✅ Professional tools</p>
+<ul>
+<li>Most comprehensive set</li>
+<li>Advanced drawing features</li>
+</ul>
+<p><strong>Lightweight Charts</strong>: ❌ Not supported</p>
+<ul>
+<li>Must implement manually</li>
+</ul>
+<p><strong>Chart.js</strong>: ❌ Not supported</p>
+<ul>
+<li>Plugins available but limited</li>
+</ul>
+<p><strong>D3.js</strong>: DIY</p>
+<ul>
+<li>Can build anything but requires significant effort</li>
+</ul>
+<h3 id="performance-comparison">Performance Comparison</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<table><thead><tr><th>Library</th><th>Large Datasets</th><th>Real-time Updates</th><th>Mobile Performance</th></tr></thead><tbody><tr><td>TradeX Chart</td><td>Good</td><td>Excellent</td><td>Good</td></tr><tr><td>TradingView</td><td>Excellent</td><td>Excellent</td><td>Excellent</td></tr><tr><td>Lightweight Charts</td><td>Excellent</td><td>Excellent</td><td>Excellent</td></tr><tr><td>Chart.js</td><td>Good</td><td>Good</td><td>Good</td></tr><tr><td>D3.js</td><td>Variable</td><td>Variable</td><td>Variable</td></tr></tbody></table>
+<h3 id="customization-levels">Customization Levels</h3>
+<p><strong>Most Customizable</strong>: D3.js > TradeX Chart > Chart.js > Lightweight Charts > TradingView</p>
+<p><strong>Easiest to Customize</strong>: Chart.js > Lightweight Charts > TradeX Chart > D3.js > TradingView</p>
+<hr>
+<h2 id="use-case-recommendations">Use Case Recommendations</h2>
+<h3 id="choose-tradex-chart-if-youre-building">Choose TradeX Chart if you’re building:</h3>
+<ul>
+<li>✅ Cryptocurrency exchange platforms</li>
+<li>✅ Stock trading applications</li>
+<li>✅ Financial analysis tools</li>
+<li>✅ Portfolio management systems</li>
+<li>✅ Trading bots with visualization</li>
+<li>✅ Custom trading platforms</li>
+<li>✅ Financial dashboards with advanced features</li>
+</ul>
+<h3 id="choose-tradingview-if-youre-building">Choose TradingView if you’re building:</h3>
+<ul>
+<li>✅ Quick MVP with charting</li>
+<li>✅ Social trading platforms</li>
+<li>✅ Content sites with embedded charts</li>
+<li>✅ Apps where you want to outsource charting</li>
+</ul>
+<h3 id="choose-lightweight-charts-if-youre-building">Choose Lightweight Charts if you’re building:</h3>
+<ul>
+<li>✅ Mobile-first trading apps</li>
+<li>✅ Simple price tracking apps</li>
+<li>✅ Lightweight dashboards</li>
+<li>✅ Apps where bundle size is critical</li>
+</ul>
+<h3 id="choose-chartjs-if-youre-building">Choose Chart.js if you’re building:</h3>
+<ul>
+<li>✅ General analytics dashboards</li>
+<li>✅ Business intelligence tools</li>
+<li>✅ Mixed chart type applications</li>
+<li>✅ Simple data visualization</li>
+</ul>
+<h3 id="choose-d3js-if-youre-building">Choose D3.js if you’re building:</h3>
+<ul>
+<li>✅ Unique, custom visualizations</li>
+<li>✅ Data journalism projects</li>
+<li>✅ Research visualization tools</li>
+<li>✅ Non-standard chart requirements</li>
+</ul>
+<hr>
+<h2 id="migration-considerations">Migration Considerations</h2>
+<h3 id="from-tradingview-to-tradex-chart">From TradingView to TradeX Chart</h3>
+<p><strong>Pros</strong>:</p>
+<ul>
+<li>Eliminate licensing costs</li>
+<li>Full control over features</li>
+<li>Better backend integration</li>
+<li>No data privacy concerns</li>
+</ul>
+<p><strong>Cons</strong>:</p>
+<ul>
+<li>Need to implement hosting</li>
+<li>Lose social features</li>
+<li>More maintenance responsibility</li>
+<li>Initial development effort</li>
+</ul>
+<p><strong>Migration effort</strong>: Medium to High</p>
+<h3 id="from-lightweight-charts-to-tradex-chart">From Lightweight Charts to TradeX Chart</h3>
+<p><strong>Pros</strong>:</p>
+<ul>
+<li>Gain technical indicators</li>
+<li>Get drawing tools</li>
+<li>More customization options</li>
+</ul>
+<p><strong>Cons</strong>:</p>
+<ul>
+<li>Larger bundle size</li>
+<li>More complex API</li>
+<li>Additional dependency</li>
+</ul>
+<p><strong>Migration effort</strong>: Low to Medium</p>
+<h3 id="from-chartjs-to-tradex-chart">From Chart.js to TradeX Chart</h3>
+<p><strong>Pros</strong>:</p>
+<ul>
+<li>Financial-specific features</li>
+<li>Better time-series handling</li>
+<li>Technical indicators included</li>
+</ul>
+<p><strong>Cons</strong>:</p>
+<ul>
+<li>Lose general chart types</li>
+<li>Different API paradigm</li>
+</ul>
+<p><strong>Migration effort</strong>: Medium</p>
+<hr>
+<h2 id="cost-analysis">Cost Analysis</h2>
+<h3 id="tradex-chart">TradeX Chart</h3>
+<ul>
+<li><strong>License</strong>: Free (GNU GPL3)</li>
+<li><strong>Hosting</strong>: Your infrastructure costs</li>
+<li><strong>Development</strong>: Initial setup + customization</li>
+<li><strong>Maintenance</strong>: Your team’s time</li>
+<li><strong>Total</strong>: Infrastructure + development time</li>
+</ul>
+<h3 id="tradingview">TradingView</h3>
+<ul>
+<li><strong>License</strong>: $50-$500+/month per user</li>
+<li><strong>Hosting</strong>: Included</li>
+<li><strong>Development</strong>: Minimal</li>
+<li><strong>Maintenance</strong>: Minimal</li>
+<li><strong>Total</strong>: Predictable monthly cost</li>
+</ul>
+<h3 id="lightweight-charts">Lightweight Charts</h3>
+<ul>
+<li><strong>License</strong>: Free (Apache 2.0)</li>
+<li><strong>Hosting</strong>: Your infrastructure costs</li>
+<li><strong>Development</strong>: Low to medium</li>
+<li><strong>Maintenance</strong>: Low</li>
+<li><strong>Total</strong>: Infrastructure + minimal development</li>
+</ul>
+<hr>
+<h2 id="conclusion">Conclusion</h2>
+<p><strong>TradeX Chart</strong> occupies a sweet spot between fully-featured proprietary solutions like TradingView and minimal libraries like Lightweight Charts. It’s ideal for:</p>
+<ul>
+<li>Teams building proprietary trading platforms</li>
+<li>Projects requiring extensive customization</li>
+<li>Applications needing self-hosted solutions</li>
+<li>Developers who want built-in indicators and drawing tools</li>
+<li>Organizations wanting to avoid vendor lock-in</li>
+</ul>
+<p>The choice ultimately depends on your specific requirements, budget, technical expertise, and long-term goals.</p>
+<h2 id="further-reading">Further Reading</h2>
+<ul>
+<li><a href="../reference/01_getting_started">Getting Started</a></li>
+<li><a href="../reference/02_configuration">Configuration</a></li>
+<li><a href="../api/core">API Reference</a></li>
+<li><a href="../reference/indicators_custom">Custom Indicators</a></li>
+</ul></div><footer class="astro-3yyafb3n"><div class="meta sl-flex astro-3yyafb3n"></div><div class="pagination-links sl-flex astro-u2l5gyhi" dir="ltr"><a href="/guides/accessibility/" rel="prev" class="astro-u2l5gyhi"><svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-u2l5gyhi">Previous<br class="astro-u2l5gyhi"><span class="link-title astro-u2l5gyhi">Accessibility</span></span></a><a href="/guides/contributing/" rel="next" class="astro-u2l5gyhi"><svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-u2l5gyhi">Next<br class="astro-u2l5gyhi"><span class="link-title astro-u2l5gyhi">Contributing to TradeX Chart</span></span></a></div></footer></div></div></main></div></div></div></div></body></html>

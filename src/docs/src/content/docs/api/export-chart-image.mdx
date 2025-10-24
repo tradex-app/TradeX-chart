@@ -1,0 +1,328 @@
+---
+title: Export Chart Image API
+description: API reference for exporting charts as images
+---
+
+# Export Chart Image API
+
+API reference for exporting charts as images in various formats.
+
+## Chart Methods
+
+### getCanvas()
+
+Get the chart's canvas element.
+
+```typescript
+chart.getCanvas(): HTMLCanvasElement
+```
+
+**Returns:** Canvas element
+
+**Example:**
+```javascript
+const canvas = chart.getCanvas()
+console.log(canvas.width, canvas.height)
+```
+
+### exportImage()
+
+Export chart as an image.
+
+```typescript
+chart.exportImage(options?: ExportOptions): Promise<Blob>
+
+interface ExportOptions {
+  format?: 'png' | 'jpeg' | 'webp'
+  quality?: number  // 0-1 for jpeg/webp
+  scale?: number    // Resolution multiplier
+  width?: number
+  height?: number
+  backgroundColor?: string
+}
+```
+
+**Parameters:**
+- `options` (optional): Export configuration
+
+**Returns:** `Promise<Blob>`
+
+**Example:**
+```javascript
+const blob = await chart.exportImage({
+  format: 'png',
+  scale: 2,
+  quality: 0.92
+})
+```
+
+### exportDataURL()
+
+Export chart as a data URL.
+
+```typescript
+chart.exportDataURL(options?: ExportOptions): string
+```
+
+**Parameters:**
+- `options` (optional): Export configuration
+
+**Returns:** Data URL string
+
+**Example:**
+```javascript
+const dataURL = chart.exportDataURL({ format: 'png' })
+const img = document.createElement('img')
+img.src = dataURL
+```
+
+## ChartExporter
+
+### Constructor
+
+```typescript
+class ChartExporter {
+  constructor(chart: TradeXChart)
+}
+```
+
+**Parameters:**
+- `chart`: TradeX chart instance
+
+**Example:**
+```javascript
+const exporter = new ChartExporter(chart)
+```
+
+### Methods
+
+#### exportPNG()
+
+Export as PNG.
+
+```typescript
+exportPNG(options?: PNGOptions): Promise<void>
+
+interface PNGOptions {
+  filename?: string
+  scale?: number
+  quality?: number
+}
+```
+
+**Parameters:**
+- `options` (optional): PNG export options
+
+**Returns:** `Promise<void>`
+
+**Example:**
+```javascript
+await exporter.exportPNG({
+  filename: 'chart.png',
+  scale: 2
+})
+```
+
+#### exportJPEG()
+
+Export as JPEG.
+
+```typescript
+exportJPEG(options?: JPEGOptions): Promise<void>
+
+interface JPEGOptions {
+  filename?: string
+  scale?: number
+  quality?: number
+  backgroundColor?: string
+}
+```
+
+**Parameters:**
+- `options` (optional): JPEG export options
+
+**Returns:** `Promise<void>`
+
+**Example:**
+```javascript
+await exporter.exportJPEG({
+  filename: 'chart.jpg',
+  quality: 0.9,
+  backgroundColor: '#ffffff'
+})
+```
+
+#### exportSVG()
+
+Export as SVG.
+
+```typescript
+exportSVG(filename?: string): Promise<void>
+```
+
+**Parameters:**
+- `filename` (optional): Output filename
+
+**Returns:** `Promise<void>`
+
+**Example:**
+```javascript
+await exporter.exportSVG('chart.svg')
+```
+
+#### exportPDF()
+
+Export as PDF.
+
+```typescript
+exportPDF(filename?: string): Promise<void>
+```
+
+**Parameters:**
+- `filename` (optional): Output filename
+
+**Returns:** `Promise<void>`
+
+**Example:**
+```javascript
+await exporter.exportPDF('chart.pdf')
+```
+
+#### copyToClipboard()
+
+Copy chart image to clipboard.
+
+```typescript
+copyToClipboard(): Promise<void>
+```
+
+**Returns:** `Promise<void>`
+
+**Example:**
+```javascript
+await exporter.copyToClipboard()
+console.log('Chart copied to clipboard')
+```
+
+## Canvas Methods
+
+### toBlob()
+
+Convert canvas to Blob.
+
+```typescript
+canvas.toBlob(
+  callback: (blob: Blob) => void,
+  type?: string,
+  quality?: number
+): void
+```
+
+**Parameters:**
+- `callback`: Function to receive the blob
+- `type` (optional): MIME type (default: 'image/png')
+- `quality` (optional): Quality 0-1 for lossy formats
+
+**Example:**
+```javascript
+canvas.toBlob((blob) => {
+  const url = URL.createObjectURL(blob)
+  // Use the blob URL
+}, 'image/png')
+```
+
+### toDataURL()
+
+Convert canvas to data URL.
+
+```typescript
+canvas.toDataURL(type?: string, quality?: number): string
+```
+
+**Parameters:**
+- `type` (optional): MIME type (default: 'image/png')
+- `quality` (optional): Quality 0-1 for lossy formats
+
+**Returns:** Data URL string
+
+**Example:**
+```javascript
+const dataURL = canvas.toDataURL('image/jpeg', 0.9)
+```
+
+## Clipboard API
+
+### Write to Clipboard
+
+```typescript
+navigator.clipboard.write(data: ClipboardItem[]): Promise<void>
+```
+
+**Example:**
+```javascript
+const canvas = chart.getCanvas()
+canvas.toBlob(async (blob) => {
+  await navigator.clipboard.write([
+    new ClipboardItem({ 'image/png': blob })
+  ])
+})
+```
+
+## Download Helper
+
+### Download Blob
+
+```typescript
+function downloadBlob(blob: Blob, filename: string): void
+```
+
+**Parameters:**
+- `blob`: Blob to download
+- `filename`: Output filename
+
+**Example:**
+```javascript
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
+}
+```
+
+## TypeScript Definitions
+
+```typescript
+declare module 'tradex-chart' {
+  export interface ExportOptions {
+    format?: 'png' | 'jpeg' | 'webp'
+    quality?: number
+    scale?: number
+    width?: number
+    height?: number
+    backgroundColor?: string
+  }
+
+  export class ChartExporter {
+    constructor(chart: TradeXChart)
+    exportPNG(options?: PNGOptions): Promise<void>
+    exportJPEG(options?: JPEGOptions): Promise<void>
+    exportSVG(filename?: string): Promise<void>
+    exportPDF(filename?: string): Promise<void>
+    copyToClipboard(): Promise<void>
+  }
+
+  export interface TradeXChart {
+    getCanvas(): HTMLCanvasElement
+    exportImage(options?: ExportOptions): Promise<Blob>
+    exportDataURL(options?: ExportOptions): string
+  }
+}
+```
+
+## Related Documentation
+
+- [Example](../examples/export-chart-image) - Export example
+- [Configuration](../reference/02_configuration) - Chart configuration

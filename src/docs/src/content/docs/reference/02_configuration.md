@@ -17,13 +17,13 @@ The configuration object is passed to the chart after an instance of it has been
 import { Chart } from 'tradex-chart'
 
 // After the chart has mounted on the DOM,
-// Provide it with a configuration object
-chart.use(config)
+// provide it with a configuration object
+chart.start(config)
 ```
 
 ## Minimal Config
 
-Config describes the basics of the chart, size, ect. It requires the following minimum properties to be valid:
+The config describes the basics of the chart, size, etc. It requires the following minimum properties to be valid:
 
 ```javascript
 import * as talib from './node_modules/talib-web/lib/index.esm'
@@ -35,27 +35,27 @@ const config = {
   // talib: `${window.location.origin}/talib.wasm`
 }
 ```
-``title`` is required so you know what asset you are looking at.
+`title` is required so you know what asset you are looking at.
 
-``talib`` is a pointer to the [talib-web](https://https//anchegt.github.io/talib-web/) technical indicator library compiled as a WebAssembly module. TradeX-chart will take care of instantiating it.
+`talib` is a pointer to the [talib-web](https://talib-web.github.io/) technical indicator library compiled as a WebAssembly module. TradeX Chart will take care of instantiating it.
 
 :::caution
-Depending upon the server configuration, ``.wasm`` files might be served with an incorrect mime type when loaded from a subdirectory.  
-If that is the case, copy ``tablib.wasm`` from ``./modules/talib-web/lib/`` to the web server root, and reference it in the config as following:  
-``talib: `${window.location.origin}/talib.wasm` ``
+Depending upon the server configuration, `.wasm` files might be served with an incorrect MIME type when loaded from a subdirectory.  
+If that is the case, copy `talib.wasm` from `./node_modules/talib-web/lib/` to the web server root, and reference it in the config as follows:  
+`talib: \`${window.location.origin}/talib.wasm\``
 :::
 
 ## Basic Config
 
-``height`` and ``width`` default to 100% of the parent element's height and width if not defined in the config. ``height`` and ``width`` are the number of pixels. The chart has a minimal height `300` and width of `400` pixels.
+`height` and `width` default to 100% of the parent element's height and width if not defined in the config. `height` and `width` are specified in pixels. The chart has a minimum height of `300` and width of `400` pixels.
 
-``rangeLimit`` defines the initial number of candles to display. It is treated as the "zoom" level of the timeline. 
+`rangeLimit` defines the initial number of candles to display. It is treated as the "zoom" level of the timeline. 
 
 [Config Object Options](#config-object-options) provides a complete overview of all settings.
 
 ## State
 
-State is a snapshot of the entirety of the chart data state, including chart price data, indicators, drawing tools, datasets and theme. Where properties of Config and ``state.settings`` overlap, Config properties take priority.
+State is a snapshot of the entirety of the chart data state, including chart price data, indicators, drawing tools, datasets, and theme. Where properties of Config and `state.settings` overlap, Config properties take priority.
 
 Chart states can be loaded (swapped) as desired. By default the chart can hold multiple states in memory.
 
@@ -65,17 +65,17 @@ The chart state can be exported to be reused later.
 chart.state.export(key)
 ```
 
-More information the chart data state are found in the [state documentation](../state) .
+More information about the chart data state can be found in the [state documentation](state).
 
 ## Range
 
 Range determines the initial start and end timestamps for the price history (candles) that the chart displays.
 
-Refer to [Initial Range Config](../range#initial-range-config) for more detail.
+Refer to [Initial Range Config](range#initial-range-config) for more detail.
 
 ## Themes
 
-For API methods to manipulate chart themes refer to [themes](../themes)
+For API methods to manipulate chart themes, refer to [themes](themes).
 
 ### Candle Types
 

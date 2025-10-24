@@ -1,0 +1,380 @@
+---
+title: Custom Theme Builder API
+description: API reference for theme customization
+---
+
+# Custom Theme Builder API
+
+API reference for customizing chart themes.
+
+## Chart Methods
+
+### setTheme()
+
+Apply a theme to the chart.
+
+```typescript
+chart.setTheme(theme: Theme): void
+
+interface Theme {
+  candle?: CandleTheme
+  background?: string
+  grid?: GridTheme
+  xAxis?: AxisTheme
+  yAxis?: AxisTheme
+  crosshair?: CrosshairTheme
+  volume?: VolumeTheme
+  indicators?: IndicatorTheme
+}
+```
+
+**Parameters:**
+- `theme`: Theme configuration object
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+chart.setTheme({
+  candle: {
+    upBodyColor: '#26a69a',
+    downBodyColor: '#ef5350'
+  },
+  background: '#1e1e1e',
+  grid: {
+    color: '#2a2a2a'
+  }
+})
+```
+
+### getTheme()
+
+Get current theme configuration.
+
+```typescript
+chart.getTheme(): Theme
+```
+
+**Returns:** Current theme object
+
+**Example:**
+```javascript
+const currentTheme = chart.getTheme()
+console.log(currentTheme.background)
+```
+
+### resetTheme()
+
+Reset to default theme.
+
+```typescript
+chart.resetTheme(): void
+```
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+chart.resetTheme()
+```
+
+## Theme Interfaces
+
+### CandleTheme
+
+```typescript
+interface CandleTheme {
+  upBodyColor?: string
+  upWickColor?: string
+  downBodyColor?: string
+  downWickColor?: string
+  borderWidth?: number
+  wickWidth?: number
+}
+```
+
+**Example:**
+```javascript
+{
+  candle: {
+    upBodyColor: '#26a69a',
+    upWickColor: '#26a69a',
+    downBodyColor: '#ef5350',
+    downWickColor: '#ef5350',
+    borderWidth: 1,
+    wickWidth: 1
+  }
+}
+```
+
+### GridTheme
+
+```typescript
+interface GridTheme {
+  color?: string
+  style?: 'solid' | 'dashed' | 'dotted'
+  lineWidth?: number
+  horizontal?: boolean
+  vertical?: boolean
+}
+```
+
+**Example:**
+```javascript
+{
+  grid: {
+    color: '#2a2a2a',
+    style: 'solid',
+    lineWidth: 1,
+    horizontal: true,
+    vertical: true
+  }
+}
+```
+
+### AxisTheme
+
+```typescript
+interface AxisTheme {
+  color?: string
+  fontSize?: number
+  fontFamily?: string
+  fontWeight?: string | number
+  height?: number  // For xAxis
+  width?: number   // For yAxis
+}
+```
+
+**Example:**
+```javascript
+{
+  xAxis: {
+    color: '#666',
+    fontSize: 12,
+    fontFamily: 'Arial',
+    height: 30
+  },
+  yAxis: {
+    color: '#666',
+    fontSize: 12,
+    fontFamily: 'Arial',
+    width: 80
+  }
+}
+```
+
+### CrosshairTheme
+
+```typescript
+interface CrosshairTheme {
+  color?: string
+  style?: 'solid' | 'dashed' | 'dotted'
+  lineWidth?: number
+}
+```
+
+**Example:**
+```javascript
+{
+  crosshair: {
+    color: '#888',
+    style: 'dashed',
+    lineWidth: 1
+  }
+}
+```
+
+### VolumeTheme
+
+```typescript
+interface VolumeTheme {
+  upColor?: string
+  downColor?: string
+  opacity?: number
+}
+```
+
+**Example:**
+```javascript
+{
+  volume: {
+    upColor: 'rgba(38, 166, 154, 0.5)',
+    downColor: 'rgba(239, 83, 80, 0.5)',
+    opacity: 0.5
+  }
+}
+```
+
+### IndicatorTheme
+
+```typescript
+interface IndicatorTheme {
+  colors?: string[]
+  lineWidth?: number
+  opacity?: number
+}
+```
+
+**Example:**
+```javascript
+{
+  indicators: {
+    colors: ['#2196F3', '#FF9800', '#4CAF50', '#E91E63'],
+    lineWidth: 2,
+    opacity: 1
+  }
+}
+```
+
+## Preset Themes
+
+### Dark Theme
+
+```typescript
+const darkTheme: Theme = {
+  candle: {
+    upBodyColor: '#26a69a',
+    upWickColor: '#26a69a',
+    downBodyColor: '#ef5350',
+    downWickColor: '#ef5350'
+  },
+  background: '#1e1e1e',
+  grid: {
+    color: '#2a2a2a',
+    style: 'solid'
+  },
+  xAxis: {
+    color: '#888',
+    fontSize: 12
+  },
+  yAxis: {
+    color: '#888',
+    fontSize: 12
+  },
+  crosshair: {
+    color: '#666',
+    style: 'dashed'
+  }
+}
+```
+
+### Light Theme
+
+```typescript
+const lightTheme: Theme = {
+  candle: {
+    upBodyColor: '#4caf50',
+    upWickColor: '#4caf50',
+    downBodyColor: '#f44336',
+    downWickColor: '#f44336'
+  },
+  background: '#ffffff',
+  grid: {
+    color: '#e0e0e0',
+    style: 'solid'
+  },
+  xAxis: {
+    color: '#333',
+    fontSize: 12
+  },
+  yAxis: {
+    color: '#333',
+    fontSize: 12
+  },
+  crosshair: {
+    color: '#999',
+    style: 'dashed'
+  }
+}
+```
+
+## Events
+
+### themeChanged
+
+```typescript
+chart.on('themeChanged', (event: ThemeEvent) => void)
+
+interface ThemeEvent {
+  theme: Theme
+}
+```
+
+**Example:**
+```javascript
+chart.on('themeChanged', (event) => {
+  console.log('Theme changed:', event.theme)
+})
+```
+
+## TypeScript Definitions
+
+```typescript
+declare module 'tradex-chart' {
+  export interface Theme {
+    candle?: CandleTheme
+    background?: string
+    grid?: GridTheme
+    xAxis?: AxisTheme
+    yAxis?: AxisTheme
+    crosshair?: CrosshairTheme
+    volume?: VolumeTheme
+    indicators?: IndicatorTheme
+  }
+
+  export interface CandleTheme {
+    upBodyColor?: string
+    upWickColor?: string
+    downBodyColor?: string
+    downWickColor?: string
+    borderWidth?: number
+    wickWidth?: number
+  }
+
+  export interface GridTheme {
+    color?: string
+    style?: 'solid' | 'dashed' | 'dotted'
+    lineWidth?: number
+    horizontal?: boolean
+    vertical?: boolean
+  }
+
+  export interface AxisTheme {
+    color?: string
+    fontSize?: number
+    fontFamily?: string
+    fontWeight?: string | number
+    height?: number
+    width?: number
+  }
+
+  export interface CrosshairTheme {
+    color?: string
+    style?: 'solid' | 'dashed' | 'dotted'
+    lineWidth?: number
+  }
+
+  export interface VolumeTheme {
+    upColor?: string
+    downColor?: string
+    opacity?: number
+  }
+
+  export interface IndicatorTheme {
+    colors?: string[]
+    lineWidth?: number
+    opacity?: number
+  }
+
+  export interface TradeXChart {
+    setTheme(theme: Theme): void
+    getTheme(): Theme
+    resetTheme(): void
+  }
+}
+```
+
+## Related Documentation
+
+- [Example](../examples/custom-theme-builder) - Theme builder example
+- [Configuration](../reference/02_configuration) - Chart configuration

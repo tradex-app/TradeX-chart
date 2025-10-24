@@ -1,0 +1,339 @@
+---
+title: Custom Drawing Tools API
+description: API reference for creating custom drawing tools
+---
+
+# Custom Drawing Tools API
+
+API reference for creating and managing custom drawing tools.
+
+## Chart Methods
+
+### addDrawing()
+
+Add a drawing to the chart.
+
+```typescript
+chart.addDrawing(type: DrawingType, config: DrawingConfig): string
+
+type DrawingType = 'line' | 'rectangle' | 'circle' | 'text' | 'fibonacci'
+
+interface DrawingConfig {
+  id?: string
+  points: Point[]
+  color?: string
+  width?: number
+  style?: 'solid' | 'dashed' | 'dotted'
+  fill?: string
+  [key: string]: any
+}
+
+interface Point {
+  timestamp: number
+  price: number
+}
+```
+
+**Parameters:**
+- `type`: Type of drawing
+- `config`: Drawing configuration
+
+**Returns:** Drawing ID (string)
+
+**Example:**
+```javascript
+const id = chart.addDrawing('line', {
+  points: [
+    { timestamp: 1609459200000, price: 29000 },
+    { timestamp: 1609545600000, price: 35000 }
+  ],
+  color: '#2196F3',
+  width: 2
+})
+```
+
+### removeDrawing()
+
+Remove a drawing from the chart.
+
+```typescript
+chart.removeDrawing(id: string): void
+```
+
+**Parameters:**
+- `id`: Drawing identifier
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+chart.removeDrawing('drawing_123')
+```
+
+### updateDrawing()
+
+Update an existing drawing.
+
+```typescript
+chart.updateDrawing(id: string, config: Partial<DrawingConfig>): void
+```
+
+**Parameters:**
+- `id`: Drawing identifier
+- `config`: Updated configuration
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+chart.updateDrawing('drawing_123', {
+  color: '#FF0000',
+  width: 3
+})
+```
+
+### getDrawing()
+
+Get drawing by ID.
+
+```typescript
+chart.getDrawing(id: string): Drawing | null
+
+interface Drawing {
+  id: string
+  type: DrawingType
+  config: DrawingConfig
+}
+```
+
+**Parameters:**
+- `id`: Drawing identifier
+
+**Returns:** Drawing object or null
+
+**Example:**
+```javascript
+const drawing = chart.getDrawing('drawing_123')
+if (drawing) {
+  console.log(drawing.type, drawing.config)
+}
+```
+
+### getDrawings()
+
+Get all drawings.
+
+```typescript
+chart.getDrawings(): Drawing[]
+```
+
+**Returns:** Array of drawings
+
+**Example:**
+```javascript
+const drawings = chart.getDrawings()
+console.log(`Total drawings: ${drawings.length}`)
+```
+
+### clearDrawings()
+
+Remove all drawings.
+
+```typescript
+chart.clearDrawings(): void
+```
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+chart.clearDrawings()
+```
+
+## Drawing Types
+
+### Line
+
+```typescript
+interface LineConfig extends DrawingConfig {
+  points: [Point, Point]  // Start and end points
+  color?: string
+  width?: number
+  style?: 'solid' | 'dashed' | 'dotted'
+  extend?: boolean  // Extend line infinitely
+}
+```
+
+**Example:**
+```javascript
+chart.addDrawing('line', {
+  points: [
+    { timestamp: 1609459200000, price: 29000 },
+    { timestamp: 1609545600000, price: 35000 }
+  ],
+  color: '#2196F3',
+  width: 2,
+  extend: true
+})
+```
+
+### Rectangle
+
+```typescript
+interface RectangleConfig extends DrawingConfig {
+  points: [Point, Point]  // Top-left and bottom-right
+  fill?: string
+  stroke?: string
+  strokeWidth?: number
+}
+```
+
+**Example:**
+```javascript
+chart.addDrawing('rectangle', {
+  points: [
+    { timestamp: 1609459200000, price: 35000 },
+    { timestamp: 1609545600000, price: 29000 }
+  ],
+  fill: 'rgba(33, 150, 243, 0.1)',
+  stroke: '#2196F3',
+  strokeWidth: 2
+})
+```
+
+### Fibonacci Retracement
+
+```typescript
+interface FibonacciConfig extends DrawingConfig {
+  points: [Point, Point]  // Start and end points
+  levels?: number[]  // Fibonacci levels
+  colors?: { [level: number]: string }
+  showLabels?: boolean
+}
+```
+
+**Example:**
+```javascript
+chart.addDrawing('fibonacci', {
+  points: [
+    { timestamp: 1609459200000, price: 29000 },
+    { timestamp: 1609545600000, price: 35000 }
+  ],
+  levels: [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1],
+  showLabels: true
+})
+```
+
+### Text
+
+```typescript
+interface TextConfig extends DrawingConfig {
+  points: [Point]  // Position
+  text: string
+  fontSize?: number
+  fontFamily?: string
+  color?: string
+  backgroundColor?: string
+}
+```
+
+**Example:**
+```javascript
+chart.addDrawing('text', {
+  points: [{ timestamp: 1609459200000, price: 30000 }],
+  text: 'Support Level',
+  fontSize: 14,
+  color: '#2196F3'
+})
+```
+
+## Events
+
+### drawingAdded
+
+```typescript
+chart.on('drawingAdded', (event: DrawingEvent) => void)
+
+interface DrawingEvent {
+  id: string
+  type: DrawingType
+  config: DrawingConfig
+}
+```
+
+**Example:**
+```javascript
+chart.on('drawingAdded', (event) => {
+  console.log('Drawing added:', event.id)
+})
+```
+
+### drawingRemoved
+
+```typescript
+chart.on('drawingRemoved', (event: { id: string }) => void)
+```
+
+**Example:**
+```javascript
+chart.on('drawingRemoved', (event) => {
+  console.log('Drawing removed:', event.id)
+})
+```
+
+### drawingUpdated
+
+```typescript
+chart.on('drawingUpdated', (event: DrawingEvent) => void)
+```
+
+**Example:**
+```javascript
+chart.on('drawingUpdated', (event) => {
+  console.log('Drawing updated:', event.id)
+})
+```
+
+## TypeScript Definitions
+
+```typescript
+declare module 'tradex-chart' {
+  export type DrawingType = 'line' | 'rectangle' | 'circle' | 'text' | 'fibonacci'
+
+  export interface Point {
+    timestamp: number
+    price: number
+  }
+
+  export interface DrawingConfig {
+    id?: string
+    points: Point[]
+    color?: string
+    width?: number
+    style?: 'solid' | 'dashed' | 'dotted'
+    fill?: string
+    [key: string]: any
+  }
+
+  export interface Drawing {
+    id: string
+    type: DrawingType
+    config: DrawingConfig
+  }
+
+  export interface TradeXChart {
+    addDrawing(type: DrawingType, config: DrawingConfig): string
+    removeDrawing(id: string): void
+    updateDrawing(id: string, config: Partial<DrawingConfig>): void
+    getDrawing(id: string): Drawing | null
+    getDrawings(): Drawing[]
+    clearDrawings(): void
+  }
+}
+```
+
+## Related Documentation
+
+- [Example](../examples/custom-drawing-tools) - Drawing tools example
+- [Events](../reference/events) - Event reference
+- [Configuration](../reference/02_configuration) - Chart configuration

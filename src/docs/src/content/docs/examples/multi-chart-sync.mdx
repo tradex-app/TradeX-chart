@@ -1,0 +1,119 @@
+---
+title: Multi-Chart Synchronization
+description: Synchronize multiple charts for crosshair, zoom, and scroll
+---
+
+# Multi-Chart Synchronization
+
+Synchronize multiple TradeX charts to display different symbols or timeframes with linked interactions.
+
+## Basic Synchronization
+
+```javascript
+class ChartSynchronizer {
+  constructor() {
+    this.charts = []
+    this.syncEnabled = true
+  }
+
+  addChart(chart) {
+    this.charts.push(chart)
+    this.setupListeners(chart)
+  }
+
+  setupListeners(chart) {
+    chart.on('crosshair', (event) => {
+      if (!this.syncEnabled) return
+      
+      this.charts.forEach(c => {
+        if (c !== chart) {
+          c.setCrosshair(event.timestamp, event.price)
+        }
+      })
+    })
+
+    chart.on('zoom', (event) => {
+      if (!this.syncEnabled) return
+      
+      this.charts.forEach(c => {
+        if (c !== chart) {
+          c.setZoom(event.level)
+        }
+      })
+    })
+
+    chart.on('scroll', (event) => {
+      if (!this.syncEnabled) return
+      
+      this.charts.forEach(c => {
+        if (c !== chart) {
+          c.scrollTo(event.position)
+        }
+      })
+    })
+  }
+
+  toggleSync() {
+    this.syncEnabled = !this.syncEnabled
+  }
+}
+
+// Usage
+const sync = new ChartSynchronizer()
+
+const chart1 = document.getElementById('chart1')
+const chart2 = document.getElementById('chart2')
+
+sync.addChart(chart1)
+sync.addChart(chart2)
+```
+
+## Multi-Symbol Dashboard
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+      height: 100vh;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="chart-grid">
+    <tradex-chart id="btc-chart"></tradex-chart>
+    <tradex-chart id="eth-chart"></tradex-chart>
+    <tradex-chart id="bnb-chart"></tradex-chart>
+    <tradex-chart id="sol-chart"></tradex-chart>
+  </div>
+
+  <script>
+    const symbols = ['BTCUSDT', 'ETHUSDT', 'BNBUSDT', 'SOLUSDT']
+    const sync = new ChartSynchronizer()
+
+    symbols.forEach((symbol, index) => {
+      const chart = document.getElementById(`${symbol.toLowerCase().slice(0, 3)}-chart`)
+      
+      chart.start({
+        title: symbol,
+        state: {
+          ohlcv: [] // Load data for each symbol
+        }
+      })
+
+      sync.addChart(chart)
+    })
+  </script>
+</body>
+</html>
+```
+
+## Related Documentation
+
+- [API Reference](../api/multi-chart-sync) - Multi-chart API
+- [Events](../reference/events) - Chart events

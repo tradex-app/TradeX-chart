@@ -17,9 +17,9 @@ yarn add tradex-chart
 ```
 
 ### CDN
-You can use `jsDelivr`, `unpkg` or others.
+You can use `jsDelivr`, `unpkg`, or others.
 ```html
-<!-- jsdelivr -->
+<!-- jsDelivr -->
 <script src="https://cdn.jsdelivr.net/npm/tradex-chart/dist/tradex-chart.umd.min.js"></script>
 
 <!-- unpkg -->
@@ -38,17 +38,17 @@ import { Chart } from 'tradex-chart'
 
 // Create an empty chart and insert it into the DOM
 let chart = document.createElement("tradex-chart")
-let mount = document.getElementByID("#mount")
+let mount = document.getElementById("mount")
     mount.appendChild(chart)
 ```
 
 
 ## Step 2.  Configure the Chart
 
-When the chart has mounted on the DOM, will display as empty as it has no data.
+When the chart has mounted on the DOM, it will display as empty since it has no data.
 
-Without a configuration, the chart won't do anything useful, so you need define a few things. The [Configuration](../02_configuration) documentation will explain what options are available.
+Without a configuration, the chart won't do anything useful, so you need to define a few things. The [Configuration](02_configuration) documentation will explain what options are available.
 
 ```javascript
-chart.use(config)
+chart.start(config)
 ```

@@ -1,0 +1,763 @@
+<!DOCTYPE html><html lang="en" dir="ltr" data-has-toc data-has-sidebar class="astro-bguv2lll"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1"/><title>GraphQL Integration | TradeX Chart</title><link rel="canonical"/><link rel="shortcut icon" href="/favicon.svg" type="image/svg+xml"/><meta name="generator" content="Astro v3.3.0"/><meta name="generator" content="Starlight v0.11.1"/><meta property="og:title" content="GraphQL Integration"/><meta property="og:type" content="article"/><meta property="og:url"/><meta property="og:locale" content="en"/><meta property="og:description" content="Fetching chart data using GraphQL APIs"/><meta property="og:site_name" content="TradeX Chart"/><meta name="twitter:card" content="summary_large_image"/><meta name="twitter:title" content="GraphQL Integration"/><meta name="twitter:description" content="Fetching chart data using GraphQL APIs"/><meta name="description" content="Fetching chart data using GraphQL APIs"/><script>
+	window.StarlightThemeProvider = (() => {
+		const storedTheme =
+			typeof localStorage !== 'undefined' && localStorage.getItem('starlight-theme');
+		const theme =
+			storedTheme ||
+			(window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+		document.documentElement.dataset.theme = theme === 'light' ? 'light' : 'dark';
+		return {
+			updatePickers(theme = storedTheme || 'auto') {
+				document.querySelectorAll('starlight-theme-select').forEach((picker) => {
+					const select = picker.querySelector('select');
+					if (select) select.value = theme;
+					/** @type {HTMLTemplateElement | null} */
+					const tmpl = document.querySelector(`#theme-icons`);
+					const newIcon = tmpl && tmpl.content.querySelector('.' + theme);
+					if (newIcon) {
+						const oldIcon = picker.querySelector('svg.label-icon');
+						if (oldIcon) {
+							oldIcon.replaceChildren(...newIcon.cloneNode(true).childNodes);
+						}
+					}
+				});
+			},
+		};
+	})();
+</script><template id="theme-icons"><svg aria-hidden="true" class="light astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M5 12a1 1 0 0 0-1-1H3a1 1 0 0 0 0 2h1a1 1 0 0 0 1-1Zm.64 5-.71.71a1 1 0 0 0 0 1.41 1 1 0 0 0 1.41 0l.71-.71A1 1 0 0 0 5.64 17ZM12 5a1 1 0 0 0 1-1V3a1 1 0 0 0-2 0v1a1 1 0 0 0 1 1Zm5.66 2.34a1 1 0 0 0 .7-.29l.71-.71a1 1 0 1 0-1.41-1.41l-.66.71a1 1 0 0 0 0 1.41 1 1 0 0 0 .66.29Zm-12-.29a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.71-.71a1.004 1.004 0 1 0-1.43 1.41l.73.71ZM21 11h-1a1 1 0 0 0 0 2h1a1 1 0 0 0 0-2Zm-2.64 6A1 1 0 0 0 17 18.36l.71.71a1 1 0 0 0 1.41 0 1 1 0 0 0 0-1.41l-.76-.66ZM12 6.5a5.5 5.5 0 1 0 5.5 5.5A5.51 5.51 0 0 0 12 6.5Zm0 9a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7Zm0 3.5a1 1 0 0 0-1 1v1a1 1 0 0 0 2 0v-1a1 1 0 0 0-1-1Z"/></svg><svg aria-hidden="true" class="dark astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.64 13a1 1 0 0 0-1.05-.14 8.049 8.049 0 0 1-3.37.73 8.15 8.15 0 0 1-8.14-8.1 8.59 8.59 0 0 1 .25-2A1 1 0 0 0 8 2.36a10.14 10.14 0 1 0 14 11.69 1 1 0 0 0-.36-1.05Zm-9.5 6.69A8.14 8.14 0 0 1 7.08 5.22v.27a10.15 10.15 0 0 0 10.14 10.14 9.784 9.784 0 0 0 2.1-.22 8.11 8.11 0 0 1-7.18 4.32v-.04Z"/></svg><svg aria-hidden="true" class="auto astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg></template><link rel="stylesheet" href="/_astro/index.88731c60.css" />
+<style>svg:where(.astro-c6vsoqas){color:var(--sl-icon-color);font-size:var(--sl-icon-size, 1em);width:1em;height:1em}
+</style><script type="module" src="/_astro/hoisted.dbfb2330.js"></script></head><body class="astro-bguv2lll"><a href="#_top" class="astro-7q3lir66">Skip to content</a><div class="page sl-flex astro-vrdttmbt"><header class="header astro-vrdttmbt"><div class="header sl-flex astro-kmkmnagf"><div class="sl-flex astro-kmkmnagf"><a href="/" class="site-title sl-flex astro-m46x6ez3"><img class="astro-m46x6ez3" alt="" src="/_astro/tx.82979636.svg" width="48" height="48"><span class="astro-m46x6ez3">TradeX Chart</span></a></div><div class="sl-flex astro-kmkmnagf"><site-search data-translations="{&#34;placeholder&#34;:&#34;Search&#34;}" class="astro-v37mnknz"><button data-open-modal disabled class="astro-v37mnknz"><svg aria-label="Search" class="astro-v37mnknz astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21.71 20.29 18 16.61A9 9 0 1 0 16.61 18l3.68 3.68a.999.999 0 0 0 1.42 0 1 1 0 0 0 0-1.39ZM11 18a7 7 0 1 1 0-14 7 7 0 0 1 0 14Z"/></svg><span class="sl-hidden md:sl-block astro-v37mnknz" aria-hidden="true">Search</span><svg aria-label="(Press / to Search)" class="sl-hidden md:sl-block astro-v37mnknz astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 2H7a5 5 0 0 0-5 5v10a5 5 0 0 0 5 5h10a5 5 0 0 0 5-5V7a5 5 0 0 0-5-5Zm3 15a3 3 0 0 1-3 3H7a3 3 0 0 1-3-3V7a3 3 0 0 1 3-3h10a3 3 0 0 1 3 3v10Z"/><path d="M15.293 6.707a1 1 0 1 1 1.414 1.414l-8.485 8.486a1 1 0 0 1-1.414-1.415l8.485-8.485Z"/></svg></button><dialog style="padding:0" aria-label="Search" class="astro-v37mnknz"><div class="dialog-frame sl-flex astro-v37mnknz"><button data-close-modal class="sl-flex md:sl-hidden astro-v37mnknz">Cancel</button><div class="search-container astro-v37mnknz"><div id="starlight__search" class="astro-v37mnknz"></div></div></div></dialog></site-search></div><div class="sl-hidden md:sl-flex right-group astro-kmkmnagf"><div class="sl-flex social-icons astro-kmkmnagf"><a href="https://github.com/tradex-app/TradeX-chart" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">GitHub</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M12 .3a12 12 0 0 0-3.8 23.38c.6.12.83-.26.83-.57L9 21.07c-3.34.72-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.08-.74.09-.73.09-.73 1.2.09 1.83 1.24 1.83 1.24 1.08 1.83 2.81 1.3 3.5 1 .1-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.14-.3-.54-1.52.1-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 0 1 6 0c2.28-1.55 3.29-1.23 3.29-1.23.64 1.66.24 2.88.12 3.18a4.65 4.65 0 0 1 1.23 3.22c0 4.61-2.8 5.63-5.48 5.92.42.36.81 1.1.81 2.22l-.01 3.29c0 .31.2.69.82.57A12 12 0 0 0 12 .3Z"/></svg></a><a href="https://discord.com/channels/1039287962510311434/1039288750913634405" rel="me" class="sl-flex astro-wy4te6ga"><span class="sr-only astro-wy4te6ga">Discord</span><svg aria-hidden="true" class="astro-wy4te6ga astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M20.32 4.37a19.8 19.8 0 0 0-4.93-1.51 13.78 13.78 0 0 0-.64 1.28 18.27 18.27 0 0 0-5.5 0 12.64 12.64 0 0 0-.64-1.28h-.05A19.74 19.74 0 0 0 3.64 4.4 20.26 20.26 0 0 0 .11 18.09l.02.02a19.9 19.9 0 0 0 6.04 3.03l.04-.02a14.24 14.24 0 0 0 1.23-2.03.08.08 0 0 0-.05-.07 13.1 13.1 0 0 1-1.9-.92.08.08 0 0 1 .02-.1 10.2 10.2 0 0 0 .41-.31h.04a14.2 14.2 0 0 0 12.1 0l.04.01a9.63 9.63 0 0 0 .4.32.08.08 0 0 1-.03.1 12.29 12.29 0 0 1-1.9.91.08.08 0 0 0-.02.1 15.97 15.97 0 0 0 1.27 2.01h.04a19.84 19.84 0 0 0 6.03-3.05v-.03a20.12 20.12 0 0 0-3.57-13.69ZM8.02 15.33c-1.18 0-2.16-1.08-2.16-2.42 0-1.33.96-2.42 2.16-2.42 1.21 0 2.18 1.1 2.16 2.42 0 1.34-.96 2.42-2.16 2.42Zm7.97 0c-1.18 0-2.15-1.08-2.15-2.42 0-1.33.95-2.42 2.15-2.42 1.22 0 2.18 1.1 2.16 2.42 0 1.34-.94 2.42-2.16 2.42Z"/></svg></a></div><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-4yphtoen"><span class="sr-only astro-4yphtoen">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select value="auto" class="astro-4yphtoen"><option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected="true" class="astro-4yphtoen">Auto</option></select><svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select><script>
+	StarlightThemeProvider.updatePickers();
+</script></div></div></header><nav class="sidebar astro-vrdttmbt" aria-label="Main"><starlight-menu-button class="astro-jif73yzw"><button aria-expanded="false" aria-label="Menu" aria-controls="starlight__sidebar" class="sl-flex md:sl-hidden astro-jif73yzw"><svg aria-hidden="true" class="astro-jif73yzw astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M3 8h18a1 1 0 1 0 0-2H3a1 1 0 0 0 0 2Zm18 8H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Zm0-5H3a1 1 0 0 0 0 2h18a1 1 0 0 0 0-2Z"/></svg></button></starlight-menu-button><div id="starlight__sidebar" class="sidebar-pane astro-vrdttmbt"><div class="sidebar-content sl-flex astro-vrdttmbt"><ul class="top-level astro-3ii7xxms"><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">Examples</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/examples/01_static_chart/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Static Price History</span></a></li><li class="astro-3ii7xxms"><a href="/examples/02_live_history_chart/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Pice History with Live Price Feed</span></a></li><li class="astro-3ii7xxms"><a href="/examples/custom_indicator/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Indicator</span></a></li><li class="astro-3ii7xxms"><a href="/examples/custom-drawing-tools/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Drawing Tools</span></a></li><li class="astro-3ii7xxms"><a href="/examples/custom-theme-builder/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Theme Builder</span></a></li><li class="astro-3ii7xxms"><a href="/examples/export-chart-image/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Export Chart Image</span></a></li><li class="astro-3ii7xxms"><a href="/examples/features/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Chart Features</span></a></li><li class="astro-3ii7xxms"><a href="/examples/indicator-alerts/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Indicator Alerts</span></a></li><li class="astro-3ii7xxms"><a href="/examples/mobile-responsive/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Mobile Responsive</span></a></li><li class="astro-3ii7xxms"><a href="/examples/multi-chart-sync/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Multi-Chart Synchronization</span></a></li><li class="astro-3ii7xxms"><a href="/examples/real-time-websocket/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Real-Time WebSocket</span></a></li><li class="astro-3ii7xxms"><a href="/examples/static_chart/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Static Price History</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">Guides</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">backend</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/guides/backend/data-caching-strategies/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Data Caching Strategies</span></a></li><li class="astro-3ii7xxms"><a href="/guides/backend/graphql-integration/" aria-current="page" class="astro-3ii7xxms"><span class="astro-3ii7xxms">GraphQL Integration</span></a></li><li class="astro-3ii7xxms"><a href="/guides/backend/rest-api-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">REST API Integration</span></a></li><li class="astro-3ii7xxms"><a href="/guides/backend/websocket-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">WebSocket Integration</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">deployment</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/guides/deployment/cdn-deployment/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">CDN Deployment</span></a></li><li class="astro-3ii7xxms"><a href="/guides/deployment/production-checklist/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Production Checklist</span></a></li><li class="astro-3ii7xxms"><a href="/guides/deployment/security-considerations/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Security Considerations</span></a></li><li class="astro-3ii7xxms"><a href="/guides/deployment/vite-config/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Vite Configuration</span></a></li><li class="astro-3ii7xxms"><a href="/guides/deployment/webpack-config/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Webpack Configuration</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">development</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/guides/development/build-process/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Build Process</span></a></li><li class="astro-3ii7xxms"><a href="/guides/development/contributing-code/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Contributing Code</span></a></li><li class="astro-3ii7xxms"><a href="/guides/development/debugging-tips/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Debugging Tips</span></a></li><li class="astro-3ii7xxms"><a href="/guides/development/local-setup/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Local Development Setup</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">framework-integration</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/guides/framework-integration/angular-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Angular Integration</span></a></li><li class="astro-3ii7xxms"><a href="/guides/framework-integration/nextjs-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Next.js Integration</span></a></li><li class="astro-3ii7xxms"><a href="/guides/framework-integration/react-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">React Integration</span></a></li><li class="astro-3ii7xxms"><a href="/guides/framework-integration/svelte-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Svelte Integration</span></a></li><li class="astro-3ii7xxms"><a href="/guides/framework-integration/vue-integration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Vue Integration</span></a></li></ul></details></li><li class="astro-3ii7xxms"><a href="/guides/accessibility/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Accessibility</span></a></li><li class="astro-3ii7xxms"><a href="/guides/comparison/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Library Comparison</span></a></li><li class="astro-3ii7xxms"><a href="/guides/contributing/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Contributing to TradeX Chart</span></a></li><li class="astro-3ii7xxms"><a href="/guides/custom_indicator/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Indicator - How to Build and Use</span></a></li><li class="astro-3ii7xxms"><a href="/guides/data-management/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Data Management</span></a></li><li class="astro-3ii7xxms"><a href="/guides/faq/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Frequently Asked Questions</span></a></li><li class="astro-3ii7xxms"><a href="/guides/howto/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">How To</span></a></li><li class="astro-3ii7xxms"><a href="/guides/i18n/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Internationalization (i18n)</span></a></li><li class="astro-3ii7xxms"><a href="/guides/known_bugs_issues/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Known Bugs Issues and Fixes</span></a></li><li class="astro-3ii7xxms"><a href="/guides/performance/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Performance Optimization</span></a></li><li class="astro-3ii7xxms"><a href="/guides/repurpose_indicators/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Repurpose Indicators</span></a></li><li class="astro-3ii7xxms"><a href="/guides/test/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Test</span></a></li><li class="astro-3ii7xxms"><a href="/guides/testing/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Testing</span></a></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">recipes</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/guides/recipes/add-custom-buttons/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Add Custom Buttons</span></a></li><li class="astro-3ii7xxms"><a href="/guides/recipes/change-colors-dynamically/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Change Colors Dynamically</span></a></li><li class="astro-3ii7xxms"><a href="/guides/recipes/custom-tooltips/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Tooltips</span></a></li><li class="astro-3ii7xxms"><a href="/guides/recipes/keyboard-shortcuts/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Keyboard Shortcuts</span></a></li><li class="astro-3ii7xxms"><a href="/guides/recipes/multi-language-support/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Multi-Language Support</span></a></li><li class="astro-3ii7xxms"><a href="/guides/recipes/save-restore-chart-state/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Save &amp; Restore Chart State</span></a></li></ul></details></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">Reference</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/reference/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Introduction</span></a></li><li class="astro-3ii7xxms"><a href="/reference/00_introduction/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Introduction</span></a></li><li class="astro-3ii7xxms"><a href="/reference/01_getting_started/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Getting Started</span></a></li><li class="astro-3ii7xxms"><a href="/reference/02_configuration/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Configuration</span></a></li><li class="astro-3ii7xxms"><a href="/reference/annotations/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Annotations</span></a></li><li class="astro-3ii7xxms"><a href="/reference/api-examples/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">API Examples</span></a></li><li class="astro-3ii7xxms"><a href="/reference/architecture/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Architecture</span></a></li><li class="astro-3ii7xxms"><a href="/reference/canvas_extension_layers/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Canvas Extension Layers</span></a></li><li class="astro-3ii7xxms"><a href="/reference/canvas_methods/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Canvas Methods</span></a></li><li class="astro-3ii7xxms"><a href="/reference/changelog/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Changelog</span></a></li><li class="astro-3ii7xxms"><a href="/reference/datasource/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Data Source</span></a></li><li class="astro-3ii7xxms"><a href="/reference/events/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Events</span></a></li><li class="astro-3ii7xxms"><a href="/reference/example/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Example Reference</span></a></li><li class="astro-3ii7xxms"><a href="/reference/glossary/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Glossary</span></a></li><li class="astro-3ii7xxms"><a href="/reference/hit_detection/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Hit Detection</span></a></li><li class="astro-3ii7xxms"><a href="/reference/indicators/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Indicators</span></a></li><li class="astro-3ii7xxms"><a href="/reference/indicators_custom/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Indicators</span></a></li><li class="astro-3ii7xxms"><a href="/reference/indicators_default/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Default Indicators</span></a></li><li class="astro-3ii7xxms"><a href="/reference/indicators_talib/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">TA-Lib Functions</span></a></li><li class="astro-3ii7xxms"><a href="/reference/legends/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Legends</span></a></li><li class="astro-3ii7xxms"><a href="/reference/overlays/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Overlays</span></a></li><li class="astro-3ii7xxms"><a href="/reference/overlays_custom/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Overlays</span></a></li><li class="astro-3ii7xxms"><a href="/reference/overlays_news_events/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Overlay News Events</span></a></li><li class="astro-3ii7xxms"><a href="/reference/overlays_trades/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Overlay Trades</span></a></li><li class="astro-3ii7xxms"><a href="/reference/range/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Range</span></a></li><li class="astro-3ii7xxms"><a href="/reference/state/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">State</span></a></li><li class="astro-3ii7xxms"><a href="/reference/state_machine/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">State Machine</span></a></li><li class="astro-3ii7xxms"><a href="/reference/streaming_price_data/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Streaming Price Data to the Chart</span></a></li><li class="astro-3ii7xxms"><a href="/reference/themes/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Themes</span></a></li><li class="astro-3ii7xxms"><a href="/reference/web_workers/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Web Workers</span></a></li><li class="astro-3ii7xxms"><a href="/reference/widgets/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Widgets</span></a></li></ul></details></li><li class="astro-3ii7xxms"><details open class="astro-3ii7xxms"><summary class="astro-3ii7xxms"><span class="large astro-3ii7xxms">API</span><svg aria-hidden="true" class="caret astro-3ii7xxms astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.25rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></summary><ul class="astro-3ii7xxms"><li class="astro-3ii7xxms"><a href="/api/core/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">core</span></a></li><li class="astro-3ii7xxms"><a href="/api/core-old/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">core - documentation.js</span></a></li><li class="astro-3ii7xxms"><a href="/api/core2/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">core</span></a></li><li class="astro-3ii7xxms"><a href="/api/custom-drawing-tools/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Drawing Tools API</span></a></li><li class="astro-3ii7xxms"><a href="/api/custom-theme-builder/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Custom Theme Builder API</span></a></li><li class="astro-3ii7xxms"><a href="/api/export-chart-image/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Export Chart Image API</span></a></li><li class="astro-3ii7xxms"><a href="/api/indicator-alerts/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Indicator Alerts API</span></a></li><li class="astro-3ii7xxms"><a href="/api/mobile-responsive/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Mobile Responsive API</span></a></li><li class="astro-3ii7xxms"><a href="/api/multi-chart-sync/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Multi-Chart Sync API</span></a></li><li class="astro-3ii7xxms"><a href="/api/real-time-websocket/" class="astro-3ii7xxms"><span class="astro-3ii7xxms">Real-Time WebSocket API</span></a></li></ul></details></li></ul><div class="md:sl-hidden"><div class="mobile-preferences sl-flex astro-wu23bvmt"><starlight-theme-select><label style="--sl-select-width: 6.25em" class="astro-4yphtoen"><span class="sr-only astro-4yphtoen">Select theme</span><svg aria-hidden="true" class="icon label-icon astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M21 14h-1V7a3 3 0 0 0-3-3H7a3 3 0 0 0-3 3v7H3a1 1 0 0 0-1 1v2a3 3 0 0 0 3 3h14a3 3 0 0 0 3-3v-2a1 1 0 0 0-1-1ZM6 7a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v7H6V7Zm14 10a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-1h16v1Z"/></svg><select value="auto" class="astro-4yphtoen"><option value="dark" class="astro-4yphtoen">Dark</option><option value="light" class="astro-4yphtoen">Light</option><option value="auto" selected="true" class="astro-4yphtoen">Auto</option></select><svg aria-hidden="true" class="icon caret astro-4yphtoen astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1em;"><path d="M17 9.17a1 1 0 0 0-1.41 0L12 12.71 8.46 9.17a1 1 0 1 0-1.41 1.42l4.24 4.24a1.002 1.002 0 0 0 1.42 0L17 10.59a1.002 1.002 0 0 0 0-1.42Z"/></svg></label></starlight-theme-select><script>
+	StarlightThemeProvider.updatePickers();
+</script></div></div></div></div></nav><div class="main-frame astro-vrdttmbt"><div class="lg:sl-flex astro-67yu43on"><aside class="right-sidebar-container astro-67yu43on"><div class="right-sidebar astro-67yu43on"><div class="lg:sl-hidden astro-pb3aqygn"><mobile-starlight-toc data-min-h="2" data-max-h="4" class="astro-doynk5tl"><nav aria-labelledby="starlight__on-this-page--mobile" class="astro-doynk5tl"><details id="starlight__mobile-toc" class="astro-doynk5tl"><summary id="starlight__on-this-page--mobile" class="sl-flex astro-doynk5tl"><div class="toggle sl-flex astro-doynk5tl">On this page<svg aria-hidden="true" class="caret astro-doynk5tl astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1rem;"><path d="m14.83 11.29-4.24-4.24a1 1 0 1 0-1.42 1.41L12.71 12l-3.54 3.54a1 1 0 0 0 0 1.41 1 1 0 0 0 .71.29 1 1 0 0 0 .71-.29l4.24-4.24a1.002 1.002 0 0 0 0-1.42Z"/></svg></div><span class="display-current astro-doynk5tl"></span></summary><div class="dropdown astro-doynk5tl"><ul class="isMobile astro-g2bywc46" style="--depth: 0;"><li class="astro-g2bywc46" style="--depth: 0;"><a href="#_top" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Overview</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#overview" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Overview</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#basic-graphql-query" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Basic GraphQL Query</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#1-simple-fetch-with-fetch-api" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">1. Simple Fetch with Fetch API</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#2-with-error-handling" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">2. With Error Handling</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#apollo-client-integration" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Apollo Client Integration</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#1-setup-apollo-client" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">1. Setup Apollo Client</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#2-query-with-apollo" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">2. Query with Apollo</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#3-pagination-with-apollo" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">3. Pagination with Apollo</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#graphql-subscriptions" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">GraphQL Subscriptions</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#1-real-time-updates-with-subscriptions" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">1. Real-time Updates with Subscriptions</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#2-subscribe-to-candle-updates" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">2. Subscribe to Candle Updates</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#advanced-patterns" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Advanced Patterns</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#1-batch-multiple-queries" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">1. Batch Multiple Queries</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#2-fragments-for-reusability" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">2. Fragments for Reusability</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#3-optimistic-updates" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">3. Optimistic Updates</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#error-handling" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Error Handling</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#1-comprehensive-error-handler" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">1. Comprehensive Error Handler</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#complete-example" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Complete Example</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#best-practices" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Best Practices</span></a><ul class="isMobile astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#1-use-persisted-queries" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">1. Use Persisted Queries</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#2-implement-query-batching" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">2. Implement Query Batching</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#3-cache-management" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">3. Cache Management</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#related-documentation" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Related Documentation</span></a></li></ul></div></details></nav></mobile-starlight-toc></div><div class="right-sidebar-panel sl-hidden lg:sl-block astro-pb3aqygn"><div class="sl-container astro-pb3aqygn"><starlight-toc data-min-h="2" data-max-h="4"><nav aria-labelledby="starlight__on-this-page"><h2 id="starlight__on-this-page">On this page</h2><ul class="astro-g2bywc46" style="--depth: 0;"><li class="astro-g2bywc46" style="--depth: 0;"><a href="#_top" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Overview</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#overview" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Overview</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#basic-graphql-query" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Basic GraphQL Query</span></a><ul class="astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#1-simple-fetch-with-fetch-api" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">1. Simple Fetch with Fetch API</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#2-with-error-handling" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">2. With Error Handling</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#apollo-client-integration" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Apollo Client Integration</span></a><ul class="astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#1-setup-apollo-client" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">1. Setup Apollo Client</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#2-query-with-apollo" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">2. Query with Apollo</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#3-pagination-with-apollo" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">3. Pagination with Apollo</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#graphql-subscriptions" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">GraphQL Subscriptions</span></a><ul class="astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#1-real-time-updates-with-subscriptions" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">1. Real-time Updates with Subscriptions</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#2-subscribe-to-candle-updates" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">2. Subscribe to Candle Updates</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#advanced-patterns" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Advanced Patterns</span></a><ul class="astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#1-batch-multiple-queries" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">1. Batch Multiple Queries</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#2-fragments-for-reusability" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">2. Fragments for Reusability</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#3-optimistic-updates" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">3. Optimistic Updates</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#error-handling" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Error Handling</span></a><ul class="astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#1-comprehensive-error-handler" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">1. Comprehensive Error Handler</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#complete-example" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Complete Example</span></a></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#best-practices" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Best Practices</span></a><ul class="astro-g2bywc46" style="--depth: 1;"><li class="astro-g2bywc46" style="--depth: 1;"><a href="#1-use-persisted-queries" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">1. Use Persisted Queries</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#2-implement-query-batching" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">2. Implement Query Batching</span></a></li><li class="astro-g2bywc46" style="--depth: 1;"><a href="#3-cache-management" class="astro-g2bywc46" style="--depth: 1;"><span class="astro-g2bywc46" style="--depth: 1;">3. Cache Management</span></a></li></ul></li><li class="astro-g2bywc46" style="--depth: 0;"><a href="#related-documentation" class="astro-g2bywc46" style="--depth: 0;"><span class="astro-g2bywc46" style="--depth: 0;">Related Documentation</span></a></li></ul></nav></starlight-toc></div></div></div></aside><div class="main-pane astro-67yu43on"><main data-pagefind-body lang="en" dir="ltr" class="astro-bguv2lll"><div class="content-panel astro-7nkwcw3z"><div class="sl-container astro-7nkwcw3z"><h1 id="_top" class="astro-j6tvhyss">GraphQL Integration</h1></div></div><div class="content-panel astro-7nkwcw3z"><div class="sl-container astro-7nkwcw3z"><div class="content astro-ml6ntd6l"><h1 id="graphql-integration">GraphQL Integration</h1>
+<p>Learn how to integrate TradeX Chart with GraphQL backends for flexible and efficient data fetching.</p>
+<h2 id="overview">Overview</h2>
+<p>GraphQL provides several advantages for chart data:</p>
+<ul>
+<li><strong>Precise data fetching</strong> - Request only the fields you need</li>
+<li><strong>Single endpoint</strong> - No need for multiple REST endpoints</li>
+<li><strong>Type safety</strong> - Strong typing with schema validation</li>
+<li><strong>Real-time updates</strong> - Built-in subscription support</li>
+<li><strong>Efficient batching</strong> - Combine multiple queries</li>
+</ul>
+<h2 id="basic-graphql-query">Basic GraphQL Query</h2>
+<h3 id="1-simple-fetch-with-fetch-api">1. Simple Fetch with Fetch API</h3>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> query</span><span style="color:#F97583"> =</span><span style="color:#FFAB70"> `</span></span>
+<span class="line"><span style="color:#FFAB70">  query GetOHLCV($symbol: String!, $timeframe: String!, $limit: Int!) {</span></span>
+<span class="line"><span style="color:#FFAB70">    ohlcv(symbol: $symbol, timeframe: $timeframe, limit: $limit) {</span></span>
+<span class="line"><span style="color:#FFAB70">      timestamp</span></span>
+<span class="line"><span style="color:#FFAB70">      open</span></span>
+<span class="line"><span style="color:#FFAB70">      high</span></span>
+<span class="line"><span style="color:#FFAB70">      low</span></span>
+<span class="line"><span style="color:#FFAB70">      close</span></span>
+<span class="line"><span style="color:#FFAB70">      volume</span></span>
+<span class="line"><span style="color:#FFAB70">    }</span></span>
+<span class="line"><span style="color:#FFAB70">  }</span></span>
+<span class="line"><span style="color:#FFAB70">`</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">async</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> fetchChartData(symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> limit </span><span style="color:#F97583">=</span><span style="color:#F8F8F8"> 500</span><span style="color:#B392F0">) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> response</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#B392F0"> fetch(</span><span style="color:#FFAB70">'https://api.example.com/graphql'</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#B392F0">    method</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'POST'</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">    headers</span><span style="color:#F97583">:</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#FFAB70">      'Content-Type'</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'application/json'</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#FFAB70">      'Authorization'</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'Bearer YOUR_API_KEY'</span></span>
+<span class="line"><span style="color:#B392F0">    }</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">    body</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> JSON</span><span style="color:#B392F0">.stringify({</span></span>
+<span class="line"><span style="color:#B392F0">      query</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">      variables</span><span style="color:#F97583">:</span><span style="color:#B392F0"> { symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> limit }</span></span>
+<span class="line"><span style="color:#B392F0">    })</span></span>
+<span class="line"><span style="color:#B392F0">  })</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> { </span><span style="color:#79B8FF">data</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> errors</span><span style="color:#B392F0"> } </span><span style="color:#F97583">=</span><span style="color:#F97583"> await</span><span style="color:#79B8FF"> response</span><span style="color:#B392F0">.json()</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#F97583">  if</span><span style="color:#B392F0"> (errors) {</span></span>
+<span class="line"><span style="color:#F97583">    throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Error(errors[</span><span style="color:#F8F8F8">0</span><span style="color:#B392F0">].message)</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#6B737C">  // Transform to TradeX format [timestamp, open, high, low, close, volume]</span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#79B8FF"> data</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">ohlcv</span><span style="color:#B392F0">.map(candle </span><span style="color:#F97583">=></span><span style="color:#B392F0"> [</span></span>
+<span class="line"><span style="color:#79B8FF">    candle</span><span style="color:#B392F0">.timestamp</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">    candle</span><span style="color:#B392F0">.open</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">    candle</span><span style="color:#B392F0">.high</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">    candle</span><span style="color:#B392F0">.low</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">    candle</span><span style="color:#B392F0">.close</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">    candle</span><span style="color:#B392F0">.volume</span></span>
+<span class="line"><span style="color:#B392F0">  ])</span></span>
+<span class="line"><span style="color:#B392F0">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">// Usage</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> ohlcv</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#B392F0"> fetchChartData(</span><span style="color:#FFAB70">'BTCUSDT'</span><span style="color:#BBBBBB">,</span><span style="color:#FFAB70"> '1h'</span><span style="color:#BBBBBB">,</span><span style="color:#F8F8F8"> 500</span><span style="color:#B392F0">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> chart</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> document</span><span style="color:#B392F0">.createElement(</span><span style="color:#FFAB70">'tradex-chart'</span><span style="color:#B392F0">)</span></span>
+<span class="line"><span style="color:#79B8FF">document</span><span style="color:#B392F0">.getElementById(</span><span style="color:#FFAB70">'chart'</span><span style="color:#B392F0">).appendChild(chart)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.start({</span></span>
+<span class="line"><span style="color:#B392F0">  title</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'BTC/USDT'</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">  state</span><span style="color:#F97583">:</span><span style="color:#B392F0"> { ohlcv }</span></span>
+<span class="line"><span style="color:#B392F0">})</span></span></code></pre>
+<h3 id="2-with-error-handling">2. With Error Handling</h3>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> GraphQLClient {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#B392F0">(endpoint</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> options </span><span style="color:#F97583">=</span><span style="color:#B392F0"> {}) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.endpoint </span><span style="color:#F97583">=</span><span style="color:#B392F0"> endpoint</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.headers </span><span style="color:#F97583">=</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#FFAB70">      'Content-Type'</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'application/json'</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#F97583">      ...</span><span style="color:#79B8FF">options</span><span style="color:#B392F0">.headers</span></span>
+<span class="line"><span style="color:#B392F0">    }</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#F97583">  async</span><span style="color:#B392F0"> query(query</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> variables </span><span style="color:#F97583">=</span><span style="color:#B392F0"> {}) {</span></span>
+<span class="line"><span style="color:#F97583">    try</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> response</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#B392F0"> fetch(</span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.endpoint</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#B392F0">        method</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'POST'</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        headers</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.headers</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        body</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> JSON</span><span style="color:#B392F0">.stringify({ query</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> variables })</span></span>
+<span class="line"><span style="color:#B392F0">      })</span></span>
+<span class="line"><span style="color:#B392F0">      </span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#B392F0"> (</span><span style="color:#F97583">!</span><span style="color:#79B8FF">response</span><span style="color:#B392F0">.ok) {</span></span>
+<span class="line"><span style="color:#F97583">        throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Error(</span><span style="color:#FFAB70">`HTTP error! status: </span><span style="color:#F97583">${</span><span style="color:#79B8FF">response</span><span style="color:#B392F0">.status</span><span style="color:#F97583">}</span><span style="color:#FFAB70">`</span><span style="color:#B392F0">)</span></span>
+<span class="line"><span style="color:#B392F0">      }</span></span>
+<span class="line"><span style="color:#B392F0">      </span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> result</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#79B8FF"> response</span><span style="color:#B392F0">.json()</span></span>
+<span class="line"><span style="color:#B392F0">      </span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#B392F0"> (</span><span style="color:#79B8FF">result</span><span style="color:#B392F0">.errors) {</span></span>
+<span class="line"><span style="color:#F97583">        throw</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> Error(</span></span>
+<span class="line"><span style="color:#79B8FF">          result</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">errors</span><span style="color:#B392F0">.map(e </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> e</span><span style="color:#B392F0">.message).join(</span><span style="color:#FFAB70">', '</span><span style="color:#B392F0">)</span></span>
+<span class="line"><span style="color:#B392F0">        )</span></span>
+<span class="line"><span style="color:#B392F0">      }</span></span>
+<span class="line"><span style="color:#B392F0">      </span></span>
+<span class="line"><span style="color:#F97583">      return</span><span style="color:#79B8FF"> result</span><span style="color:#B392F0">.data</span></span>
+<span class="line"><span style="color:#B392F0">    } </span><span style="color:#F97583">catch</span><span style="color:#B392F0"> (error) {</span></span>
+<span class="line"><span style="color:#79B8FF">      console</span><span style="color:#B392F0">.error(</span><span style="color:#FFAB70">'GraphQL query failed:'</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> error)</span></span>
+<span class="line"><span style="color:#F97583">      throw</span><span style="color:#B392F0"> error</span></span>
+<span class="line"><span style="color:#B392F0">    }</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">// Usage</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> client</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> GraphQLClient(</span><span style="color:#FFAB70">'https://api.example.com/graphql'</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#B392F0">  headers</span><span style="color:#F97583">:</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#FFAB70">    'Authorization'</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'Bearer YOUR_API_KEY'</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">})</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> query</span><span style="color:#F97583"> =</span><span style="color:#FFAB70"> `</span></span>
+<span class="line"><span style="color:#FFAB70">  query GetOHLCV($symbol: String!, $limit: Int!) {</span></span>
+<span class="line"><span style="color:#FFAB70">    ohlcv(symbol: $symbol, limit: $limit) {</span></span>
+<span class="line"><span style="color:#FFAB70">      timestamp open high low close volume</span></span>
+<span class="line"><span style="color:#FFAB70">    }</span></span>
+<span class="line"><span style="color:#FFAB70">  }</span></span>
+<span class="line"><span style="color:#FFAB70">`</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> data</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#79B8FF"> client</span><span style="color:#B392F0">.query(query</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#B392F0">  symbol</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'BTCUSDT'</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">  limit</span><span style="color:#F97583">:</span><span style="color:#F8F8F8"> 500</span></span>
+<span class="line"><span style="color:#B392F0">})</span></span></code></pre>
+<h2 id="apollo-client-integration">Apollo Client Integration</h2>
+<h3 id="1-setup-apollo-client">1. Setup Apollo Client</h3>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#B392F0"> { ApolloClient</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> InMemoryCache</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> gql } </span><span style="color:#F97583">from</span><span style="color:#FFAB70"> '@apollo/client'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> client</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ApolloClient({</span></span>
+<span class="line"><span style="color:#B392F0">  uri</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'https://api.example.com/graphql'</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">  cache</span><span style="color:#F97583">:</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> InMemoryCache()</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">  headers</span><span style="color:#F97583">:</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#B392F0">    authorization</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'Bearer YOUR_API_KEY'</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">})</span></span></code></pre>
+<h3 id="2-query-with-apollo">2. Query with Apollo</h3>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> GET_OHLCV</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> gql</span><span style="color:#FFAB70">`</span></span>
+<span class="line"><span style="color:#FFAB70">  query GetOHLCV($symbol: String!, $timeframe: String!, $limit: Int!) {</span></span>
+<span class="line"><span style="color:#FFAB70">    ohlcv(symbol: $symbol, timeframe: $timeframe, limit: $limit) {</span></span>
+<span class="line"><span style="color:#FFAB70">      timestamp</span></span>
+<span class="line"><span style="color:#FFAB70">      open</span></span>
+<span class="line"><span style="color:#FFAB70">      high</span></span>
+<span class="line"><span style="color:#FFAB70">      low</span></span>
+<span class="line"><span style="color:#FFAB70">      close</span></span>
+<span class="line"><span style="color:#FFAB70">      volume</span></span>
+<span class="line"><span style="color:#FFAB70">    }</span></span>
+<span class="line"><span style="color:#FFAB70">  }</span></span>
+<span class="line"><span style="color:#FFAB70">`</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">async</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> loadChart(symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe) {</span></span>
+<span class="line"><span style="color:#F97583">  try</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#B392F0"> { </span><span style="color:#79B8FF">data</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> loading</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> error</span><span style="color:#B392F0"> } </span><span style="color:#F97583">=</span><span style="color:#F97583"> await</span><span style="color:#79B8FF"> client</span><span style="color:#B392F0">.query({</span></span>
+<span class="line"><span style="color:#B392F0">      query</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> GET_OHLCV</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">      variables</span><span style="color:#F97583">:</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#B392F0">        symbol</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        timeframe</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        limit</span><span style="color:#F97583">:</span><span style="color:#F8F8F8"> 500</span></span>
+<span class="line"><span style="color:#B392F0">      }</span></span>
+<span class="line"><span style="color:#B392F0">    })</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#B392F0"> (error) </span><span style="color:#F97583">throw</span><span style="color:#B392F0"> error</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> ohlcv</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> data</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">ohlcv</span><span style="color:#B392F0">.map(candle </span><span style="color:#F97583">=></span><span style="color:#B392F0"> [</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.timestamp</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.open</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.high</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.low</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.close</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.volume</span></span>
+<span class="line"><span style="color:#B392F0">    ])</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#79B8FF">    chart</span><span style="color:#B392F0">.start({</span></span>
+<span class="line"><span style="color:#B392F0">      title</span><span style="color:#F97583">:</span><span style="color:#B392F0"> symbol</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">      state</span><span style="color:#F97583">:</span><span style="color:#B392F0"> { ohlcv }</span></span>
+<span class="line"><span style="color:#B392F0">    })</span></span>
+<span class="line"><span style="color:#B392F0">  } </span><span style="color:#F97583">catch</span><span style="color:#B392F0"> (error) {</span></span>
+<span class="line"><span style="color:#79B8FF">    console</span><span style="color:#B392F0">.error(</span><span style="color:#FFAB70">'Failed to load chart:'</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> error)</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">}</span></span></code></pre>
+<h3 id="3-pagination-with-apollo">3. Pagination with Apollo</h3>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> GET_OHLCV_PAGINATED</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> gql</span><span style="color:#FFAB70">`</span></span>
+<span class="line"><span style="color:#FFAB70">  query GetOHLCVPaginated(</span></span>
+<span class="line"><span style="color:#FFAB70">    $symbol: String!</span></span>
+<span class="line"><span style="color:#FFAB70">    $timeframe: String!</span></span>
+<span class="line"><span style="color:#FFAB70">    $limit: Int!</span></span>
+<span class="line"><span style="color:#FFAB70">    $before: Int</span></span>
+<span class="line"><span style="color:#FFAB70">  ) {</span></span>
+<span class="line"><span style="color:#FFAB70">    ohlcv(</span></span>
+<span class="line"><span style="color:#FFAB70">      symbol: $symbol</span></span>
+<span class="line"><span style="color:#FFAB70">      timeframe: $timeframe</span></span>
+<span class="line"><span style="color:#FFAB70">      limit: $limit</span></span>
+<span class="line"><span style="color:#FFAB70">      before: $before</span></span>
+<span class="line"><span style="color:#FFAB70">    ) {</span></span>
+<span class="line"><span style="color:#FFAB70">      data {</span></span>
+<span class="line"><span style="color:#FFAB70">        timestamp</span></span>
+<span class="line"><span style="color:#FFAB70">        open</span></span>
+<span class="line"><span style="color:#FFAB70">        high</span></span>
+<span class="line"><span style="color:#FFAB70">        low</span></span>
+<span class="line"><span style="color:#FFAB70">        close</span></span>
+<span class="line"><span style="color:#FFAB70">        volume</span></span>
+<span class="line"><span style="color:#FFAB70">      }</span></span>
+<span class="line"><span style="color:#FFAB70">      pageInfo {</span></span>
+<span class="line"><span style="color:#FFAB70">        hasMore</span></span>
+<span class="line"><span style="color:#FFAB70">        oldestTimestamp</span></span>
+<span class="line"><span style="color:#FFAB70">      }</span></span>
+<span class="line"><span style="color:#FFAB70">    }</span></span>
+<span class="line"><span style="color:#FFAB70">  }</span></span>
+<span class="line"><span style="color:#FFAB70">`</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> PaginatedChartLoader {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#B392F0">(client</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> chart) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.client </span><span style="color:#F97583">=</span><span style="color:#B392F0"> client</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.chart </span><span style="color:#F97583">=</span><span style="color:#B392F0"> chart</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.hasMore </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.isLoading </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> false</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#F97583">  async</span><span style="color:#B392F0"> loadInitial(symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#B392F0"> { </span><span style="color:#79B8FF">data</span><span style="color:#B392F0"> } </span><span style="color:#F97583">=</span><span style="color:#F97583"> await</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">client</span><span style="color:#B392F0">.query({</span></span>
+<span class="line"><span style="color:#B392F0">      query</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> GET_OHLCV_PAGINATED</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">      variables</span><span style="color:#F97583">:</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#B392F0">        symbol</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        timeframe</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        limit</span><span style="color:#F97583">:</span><span style="color:#F8F8F8"> 500</span></span>
+<span class="line"><span style="color:#B392F0">      }</span></span>
+<span class="line"><span style="color:#B392F0">    })</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.hasMore </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> data</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">ohlcv</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">pageInfo</span><span style="color:#B392F0">.hasMore</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.oldestTimestamp </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> data</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">ohlcv</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">pageInfo</span><span style="color:#B392F0">.oldestTimestamp</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> ohlcv</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.formatData(</span><span style="color:#79B8FF">data</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">ohlcv</span><span style="color:#B392F0">.data)</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.start({</span></span>
+<span class="line"><span style="color:#B392F0">      title</span><span style="color:#F97583">:</span><span style="color:#B392F0"> symbol</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">      state</span><span style="color:#F97583">:</span><span style="color:#B392F0"> { ohlcv }</span></span>
+<span class="line"><span style="color:#B392F0">    })</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.setupScrollListener(symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe)</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#F97583">  async</span><span style="color:#B392F0"> loadMore(symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#B392F0"> (</span><span style="color:#F97583">!</span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.hasMore </span><span style="color:#F97583">||</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.isLoading) </span><span style="color:#F97583">return</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.isLoading </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> true</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#F97583">    try</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#B392F0"> { </span><span style="color:#79B8FF">data</span><span style="color:#B392F0"> } </span><span style="color:#F97583">=</span><span style="color:#F97583"> await</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">client</span><span style="color:#B392F0">.query({</span></span>
+<span class="line"><span style="color:#B392F0">        query</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> GET_OHLCV_PAGINATED</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        variables</span><span style="color:#F97583">:</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#B392F0">          symbol</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">          timeframe</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">          limit</span><span style="color:#F97583">:</span><span style="color:#F8F8F8"> 100</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">          before</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.oldestTimestamp</span></span>
+<span class="line"><span style="color:#B392F0">        }</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        fetchPolicy</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'network-only'</span></span>
+<span class="line"><span style="color:#B392F0">      })</span></span>
+<span class="line"><span style="color:#B392F0">      </span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#B392F0">.hasMore </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> data</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">ohlcv</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">pageInfo</span><span style="color:#B392F0">.hasMore</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#B392F0">.oldestTimestamp </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> data</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">ohlcv</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">pageInfo</span><span style="color:#B392F0">.oldestTimestamp</span></span>
+<span class="line"><span style="color:#B392F0">      </span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> ohlcv</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.formatData(</span><span style="color:#79B8FF">data</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">ohlcv</span><span style="color:#B392F0">.data)</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.mergeData(ohlcv</span><span style="color:#BBBBBB">,</span><span style="color:#FFAB70"> 'prepend'</span><span style="color:#B392F0">)</span></span>
+<span class="line"><span style="color:#B392F0">      </span></span>
+<span class="line"><span style="color:#B392F0">    } </span><span style="color:#F97583">finally</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#B392F0">.isLoading </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> false</span></span>
+<span class="line"><span style="color:#B392F0">    }</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#B392F0">  formatData(data) {</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> data</span><span style="color:#B392F0">.map(candle </span><span style="color:#F97583">=></span><span style="color:#B392F0"> [</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.timestamp</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.open</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.high</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.low</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.close</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.volume</span></span>
+<span class="line"><span style="color:#B392F0">    ])</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#B392F0">  setupScrollListener(symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.on(</span><span style="color:#FFAB70">'chart_pan'</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> (event) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#F97583">      if</span><span style="color:#B392F0"> (</span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.scrollPos </span><span style="color:#F97583">&#x3C;</span><span style="color:#F8F8F8"> 100</span><span style="color:#B392F0">) {</span></span>
+<span class="line"><span style="color:#79B8FF">        this</span><span style="color:#B392F0">.loadMore(symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe)</span></span>
+<span class="line"><span style="color:#B392F0">      }</span></span>
+<span class="line"><span style="color:#B392F0">    })</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">// Usage</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> loader</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> PaginatedChartLoader(client</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> chart)</span></span>
+<span class="line"><span style="color:#F97583">await</span><span style="color:#79B8FF"> loader</span><span style="color:#B392F0">.loadInitial(</span><span style="color:#FFAB70">'BTCUSDT'</span><span style="color:#BBBBBB">,</span><span style="color:#FFAB70"> '1h'</span><span style="color:#B392F0">)</span></span></code></pre>
+<h2 id="graphql-subscriptions">GraphQL Subscriptions</h2>
+<h3 id="1-real-time-updates-with-subscriptions">1. Real-time Updates with Subscriptions</h3>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#B392F0"> { ApolloClient</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> InMemoryCache</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> split</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> HttpLink } </span><span style="color:#F97583">from</span><span style="color:#FFAB70"> '@apollo/client'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#B392F0"> { GraphQLWsLink } </span><span style="color:#F97583">from</span><span style="color:#FFAB70"> '@apollo/client/link/subscriptions'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#B392F0"> { getMainDefinition } </span><span style="color:#F97583">from</span><span style="color:#FFAB70"> '@apollo/client/utilities'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#B392F0"> { createClient } </span><span style="color:#F97583">from</span><span style="color:#FFAB70"> 'graphql-ws'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">// HTTP link for queries and mutations</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> httpLink</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> HttpLink({</span></span>
+<span class="line"><span style="color:#B392F0">  uri</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'https://api.example.com/graphql'</span></span>
+<span class="line"><span style="color:#B392F0">})</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">// WebSocket link for subscriptions</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> wsLink</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> GraphQLWsLink(</span></span>
+<span class="line"><span style="color:#B392F0">  createClient({</span></span>
+<span class="line"><span style="color:#B392F0">    url</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'wss://api.example.com/graphql'</span></span>
+<span class="line"><span style="color:#B392F0">  })</span></span>
+<span class="line"><span style="color:#B392F0">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">// Split based on operation type</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> splitLink</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> split(</span></span>
+<span class="line"><span style="color:#B392F0">  ({ query }) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> definition</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> getMainDefinition(query)</span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#B392F0"> (</span></span>
+<span class="line"><span style="color:#79B8FF">      definition</span><span style="color:#B392F0">.kind </span><span style="color:#F97583">===</span><span style="color:#FFAB70"> 'OperationDefinition'</span><span style="color:#F97583"> &#x26;&#x26;</span></span>
+<span class="line"><span style="color:#79B8FF">      definition</span><span style="color:#B392F0">.operation </span><span style="color:#F97583">===</span><span style="color:#FFAB70"> 'subscription'</span></span>
+<span class="line"><span style="color:#B392F0">    )</span></span>
+<span class="line"><span style="color:#B392F0">  }</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">  wsLink</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">  httpLink</span></span>
+<span class="line"><span style="color:#B392F0">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> client</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ApolloClient({</span></span>
+<span class="line"><span style="color:#B392F0">  link</span><span style="color:#F97583">:</span><span style="color:#B392F0"> splitLink</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">  cache</span><span style="color:#F97583">:</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> InMemoryCache()</span></span>
+<span class="line"><span style="color:#B392F0">})</span></span></code></pre>
+<h3 id="2-subscribe-to-candle-updates">2. Subscribe to Candle Updates</h3>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> CANDLE_SUBSCRIPTION</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> gql</span><span style="color:#FFAB70">`</span></span>
+<span class="line"><span style="color:#FFAB70">  subscription OnCandleUpdate($symbol: String!, $timeframe: String!) {</span></span>
+<span class="line"><span style="color:#FFAB70">    candleUpdated(symbol: $symbol, timeframe: $timeframe) {</span></span>
+<span class="line"><span style="color:#FFAB70">      timestamp</span></span>
+<span class="line"><span style="color:#FFAB70">      open</span></span>
+<span class="line"><span style="color:#FFAB70">      high</span></span>
+<span class="line"><span style="color:#FFAB70">      low</span></span>
+<span class="line"><span style="color:#FFAB70">      close</span></span>
+<span class="line"><span style="color:#FFAB70">      volume</span></span>
+<span class="line"><span style="color:#FFAB70">      isClosed</span></span>
+<span class="line"><span style="color:#FFAB70">    }</span></span>
+<span class="line"><span style="color:#FFAB70">  }</span></span>
+<span class="line"><span style="color:#FFAB70">`</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> RealtimeChart {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#B392F0">(client</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> chart) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.client </span><span style="color:#F97583">=</span><span style="color:#B392F0"> client</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.chart </span><span style="color:#F97583">=</span><span style="color:#B392F0"> chart</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.subscription </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#B392F0">  subscribe(symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.subscription </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.client</span></span>
+<span class="line"><span style="color:#B392F0">      .subscribe({</span></span>
+<span class="line"><span style="color:#B392F0">        query</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> CANDLE_SUBSCRIPTION</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        variables</span><span style="color:#F97583">:</span><span style="color:#B392F0"> { symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe }</span></span>
+<span class="line"><span style="color:#B392F0">      })</span></span>
+<span class="line"><span style="color:#B392F0">      .subscribe({</span></span>
+<span class="line"><span style="color:#B392F0">        next</span><span style="color:#F97583">:</span><span style="color:#B392F0"> ({ data }) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#79B8FF">          this</span><span style="color:#B392F0">.handleCandleUpdate(</span><span style="color:#79B8FF">data</span><span style="color:#B392F0">.candleUpdated)</span></span>
+<span class="line"><span style="color:#B392F0">        }</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        error</span><span style="color:#F97583">:</span><span style="color:#B392F0"> (error) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#79B8FF">          console</span><span style="color:#B392F0">.error(</span><span style="color:#FFAB70">'Subscription error:'</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> error)</span></span>
+<span class="line"><span style="color:#6B737C">          // Attempt to reconnect</span></span>
+<span class="line"><span style="color:#B392F0">          setTimeout(() </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.subscribe(symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe)</span><span style="color:#BBBBBB">,</span><span style="color:#F8F8F8"> 5000</span><span style="color:#B392F0">)</span></span>
+<span class="line"><span style="color:#B392F0">        }</span></span>
+<span class="line"><span style="color:#B392F0">      })</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#B392F0">  handleCandleUpdate(candle) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> formattedCandle</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> [</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.timestamp</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.open</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.high</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.low</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.close</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">      candle</span><span style="color:#B392F0">.volume</span></span>
+<span class="line"><span style="color:#B392F0">    ]</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#B392F0"> (</span><span style="color:#79B8FF">candle</span><span style="color:#B392F0">.isClosed) {</span></span>
+<span class="line"><span style="color:#6B737C">      // Candle is complete, add to chart</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.addCandle(formattedCandle)</span></span>
+<span class="line"><span style="color:#B392F0">    } </span><span style="color:#F97583">else</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#6B737C">      // Candle is still forming, update streaming</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.updateStreamingCandle(formattedCandle)</span></span>
+<span class="line"><span style="color:#B392F0">    }</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#B392F0">  unsubscribe() {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#B392F0"> (</span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.subscription) {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">subscription</span><span style="color:#B392F0">.unsubscribe()</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#B392F0">.subscription </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span></span>
+<span class="line"><span style="color:#B392F0">    }</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">// Usage</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> realtimeChart</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> RealtimeChart(client</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> chart)</span></span>
+<span class="line"><span style="color:#79B8FF">realtimeChart</span><span style="color:#B392F0">.subscribe(</span><span style="color:#FFAB70">'BTCUSDT'</span><span style="color:#BBBBBB">,</span><span style="color:#FFAB70"> '1h'</span><span style="color:#B392F0">)</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">// Cleanup on unmount</span></span>
+<span class="line"><span style="color:#6B737C">// realtimeChart.unsubscribe()</span></span></code></pre>
+<h2 id="advanced-patterns">Advanced Patterns</h2>
+<h3 id="1-batch-multiple-queries">1. Batch Multiple Queries</h3>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> BATCH_QUERY</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> gql</span><span style="color:#FFAB70">`</span></span>
+<span class="line"><span style="color:#FFAB70">  query BatchData($symbols: [String!]!, $timeframe: String!) {</span></span>
+<span class="line"><span style="color:#FFAB70">    charts(symbols: $symbols, timeframe: $timeframe) {</span></span>
+<span class="line"><span style="color:#FFAB70">      symbol</span></span>
+<span class="line"><span style="color:#FFAB70">      ohlcv {</span></span>
+<span class="line"><span style="color:#FFAB70">        timestamp</span></span>
+<span class="line"><span style="color:#FFAB70">        open</span></span>
+<span class="line"><span style="color:#FFAB70">        high</span></span>
+<span class="line"><span style="color:#FFAB70">        low</span></span>
+<span class="line"><span style="color:#FFAB70">        close</span></span>
+<span class="line"><span style="color:#FFAB70">        volume</span></span>
+<span class="line"><span style="color:#FFAB70">      }</span></span>
+<span class="line"><span style="color:#FFAB70">    }</span></span>
+<span class="line"><span style="color:#FFAB70">  }</span></span>
+<span class="line"><span style="color:#FFAB70">`</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">async</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> loadMultipleCharts(symbols</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe) {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> { </span><span style="color:#79B8FF">data</span><span style="color:#B392F0"> } </span><span style="color:#F97583">=</span><span style="color:#F97583"> await</span><span style="color:#79B8FF"> client</span><span style="color:#B392F0">.query({</span></span>
+<span class="line"><span style="color:#B392F0">    query</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> BATCH_QUERY</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">    variables</span><span style="color:#F97583">:</span><span style="color:#B392F0"> { symbols</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe }</span></span>
+<span class="line"><span style="color:#B392F0">  })</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#79B8FF"> charts</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> {}</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#79B8FF">  data</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">charts</span><span style="color:#B392F0">.forEach(chartData </span><span style="color:#F97583">=></span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> ohlcv</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> chartData</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">ohlcv</span><span style="color:#B392F0">.map(c </span><span style="color:#F97583">=></span><span style="color:#B392F0"> [</span></span>
+<span class="line"><span style="color:#79B8FF">      c</span><span style="color:#B392F0">.timestamp</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> c</span><span style="color:#B392F0">.open</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> c</span><span style="color:#B392F0">.high</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> c</span><span style="color:#B392F0">.low</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> c</span><span style="color:#B392F0">.close</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> c</span><span style="color:#B392F0">.volume</span></span>
+<span class="line"><span style="color:#B392F0">    ])</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> chart</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> document</span><span style="color:#B392F0">.createElement(</span><span style="color:#FFAB70">'tradex-chart'</span><span style="color:#B392F0">)</span></span>
+<span class="line"><span style="color:#79B8FF">    document</span><span style="color:#B392F0">.getElementById(</span><span style="color:#FFAB70">`chart-</span><span style="color:#F97583">${</span><span style="color:#79B8FF">chartData</span><span style="color:#B392F0">.symbol</span><span style="color:#F97583">}</span><span style="color:#FFAB70">`</span><span style="color:#B392F0">).appendChild(chart)</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#79B8FF">    chart</span><span style="color:#B392F0">.start({</span></span>
+<span class="line"><span style="color:#B392F0">      title</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> chartData</span><span style="color:#B392F0">.symbol</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">      state</span><span style="color:#F97583">:</span><span style="color:#B392F0"> { ohlcv }</span></span>
+<span class="line"><span style="color:#B392F0">    })</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#B392F0">    charts[</span><span style="color:#79B8FF">chartData</span><span style="color:#B392F0">.symbol] </span><span style="color:#F97583">=</span><span style="color:#B392F0"> chart</span></span>
+<span class="line"><span style="color:#B392F0">  })</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#F97583">  return</span><span style="color:#B392F0"> charts</span></span>
+<span class="line"><span style="color:#B392F0">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">// Load multiple charts at once</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> charts</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#B392F0"> loadMultipleCharts(</span></span>
+<span class="line"><span style="color:#B392F0">  [</span><span style="color:#FFAB70">'BTCUSDT'</span><span style="color:#BBBBBB">,</span><span style="color:#FFAB70"> 'ETHUSDT'</span><span style="color:#BBBBBB">,</span><span style="color:#FFAB70"> 'BNBUSDT'</span><span style="color:#B392F0">]</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#FFAB70">  '1h'</span></span>
+<span class="line"><span style="color:#B392F0">)</span></span></code></pre>
+<h3 id="2-fragments-for-reusability">2. Fragments for Reusability</h3>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> CANDLE_FRAGMENT</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> gql</span><span style="color:#FFAB70">`</span></span>
+<span class="line"><span style="color:#FFAB70">  fragment CandleFields on Candle {</span></span>
+<span class="line"><span style="color:#FFAB70">    timestamp</span></span>
+<span class="line"><span style="color:#FFAB70">    open</span></span>
+<span class="line"><span style="color:#FFAB70">    high</span></span>
+<span class="line"><span style="color:#FFAB70">    low</span></span>
+<span class="line"><span style="color:#FFAB70">    close</span></span>
+<span class="line"><span style="color:#FFAB70">    volume</span></span>
+<span class="line"><span style="color:#FFAB70">  }</span></span>
+<span class="line"><span style="color:#FFAB70">`</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> GET_CHART_DATA</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> gql</span><span style="color:#FFAB70">`</span></span>
+<span class="line"><span style="color:#F97583">  ${</span><span style="color:#79B8FF">CANDLE_FRAGMENT</span><span style="color:#F97583">}</span></span>
+<span class="line"><span style="color:#FFAB70">  query GetChartData($symbol: String!, $timeframe: String!) {</span></span>
+<span class="line"><span style="color:#FFAB70">    chart(symbol: $symbol, timeframe: $timeframe) {</span></span>
+<span class="line"><span style="color:#FFAB70">      symbol</span></span>
+<span class="line"><span style="color:#FFAB70">      timeframe</span></span>
+<span class="line"><span style="color:#FFAB70">      candles {</span></span>
+<span class="line"><span style="color:#FFAB70">        ...CandleFields</span></span>
+<span class="line"><span style="color:#FFAB70">      }</span></span>
+<span class="line"><span style="color:#FFAB70">      indicators {</span></span>
+<span class="line"><span style="color:#FFAB70">        name</span></span>
+<span class="line"><span style="color:#FFAB70">        values</span></span>
+<span class="line"><span style="color:#FFAB70">      }</span></span>
+<span class="line"><span style="color:#FFAB70">    }</span></span>
+<span class="line"><span style="color:#FFAB70">  }</span></span>
+<span class="line"><span style="color:#FFAB70">`</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> GET_HISTORICAL</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> gql</span><span style="color:#FFAB70">`</span></span>
+<span class="line"><span style="color:#F97583">  ${</span><span style="color:#79B8FF">CANDLE_FRAGMENT</span><span style="color:#F97583">}</span></span>
+<span class="line"><span style="color:#FFAB70">  query GetHistorical($symbol: String!, $start: Int!, $end: Int!) {</span></span>
+<span class="line"><span style="color:#FFAB70">    historical(symbol: $symbol, start: $start, end: $end) {</span></span>
+<span class="line"><span style="color:#FFAB70">      ...CandleFields</span></span>
+<span class="line"><span style="color:#FFAB70">    }</span></span>
+<span class="line"><span style="color:#FFAB70">  }</span></span>
+<span class="line"><span style="color:#FFAB70">`</span></span></code></pre>
+<h3 id="3-optimistic-updates">3. Optimistic Updates</h3>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> ADD_DRAWING</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> gql</span><span style="color:#FFAB70">`</span></span>
+<span class="line"><span style="color:#FFAB70">  mutation AddDrawing($chartId: ID!, $drawing: DrawingInput!) {</span></span>
+<span class="line"><span style="color:#FFAB70">    addDrawing(chartId: $chartId, drawing: $drawing) {</span></span>
+<span class="line"><span style="color:#FFAB70">      id</span></span>
+<span class="line"><span style="color:#FFAB70">      type</span></span>
+<span class="line"><span style="color:#FFAB70">      coordinates</span></span>
+<span class="line"><span style="color:#FFAB70">      style</span></span>
+<span class="line"><span style="color:#FFAB70">    }</span></span>
+<span class="line"><span style="color:#FFAB70">  }</span></span>
+<span class="line"><span style="color:#FFAB70">`</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">async</span><span style="color:#F97583"> function</span><span style="color:#B392F0"> addDrawing(chartId</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> drawing) {</span></span>
+<span class="line"><span style="color:#F97583">  await</span><span style="color:#79B8FF"> client</span><span style="color:#B392F0">.mutate({</span></span>
+<span class="line"><span style="color:#B392F0">    mutation</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> ADD_DRAWING</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">    variables</span><span style="color:#F97583">:</span><span style="color:#B392F0"> { chartId</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> drawing }</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">    optimisticResponse</span><span style="color:#F97583">:</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#B392F0">      addDrawing</span><span style="color:#F97583">:</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#B392F0">        __typename</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'Drawing'</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        id</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'temp-'</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> Date</span><span style="color:#B392F0">.now()</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#F97583">        ...</span><span style="color:#B392F0">drawing</span></span>
+<span class="line"><span style="color:#B392F0">      }</span></span>
+<span class="line"><span style="color:#B392F0">    }</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">    update</span><span style="color:#F97583">:</span><span style="color:#B392F0"> (cache</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> { data: { addDrawing } }) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#6B737C">      // Update cache immediately</span></span>
+<span class="line"><span style="color:#F97583">      const</span><span style="color:#79B8FF"> existing</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> cache</span><span style="color:#B392F0">.readQuery({</span></span>
+<span class="line"><span style="color:#B392F0">        query</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> GET_DRAWINGS</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        variables</span><span style="color:#F97583">:</span><span style="color:#B392F0"> { chartId }</span></span>
+<span class="line"><span style="color:#B392F0">      })</span></span>
+<span class="line"><span style="color:#B392F0">      </span></span>
+<span class="line"><span style="color:#79B8FF">      cache</span><span style="color:#B392F0">.writeQuery({</span></span>
+<span class="line"><span style="color:#B392F0">        query</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> GET_DRAWINGS</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        variables</span><span style="color:#F97583">:</span><span style="color:#B392F0"> { chartId }</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        data</span><span style="color:#F97583">:</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#B392F0">          drawings</span><span style="color:#F97583">:</span><span style="color:#B392F0"> [</span><span style="color:#F97583">...</span><span style="color:#79B8FF">existing</span><span style="color:#B392F0">.drawings</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> addDrawing]</span></span>
+<span class="line"><span style="color:#B392F0">        }</span></span>
+<span class="line"><span style="color:#B392F0">      })</span></span>
+<span class="line"><span style="color:#B392F0">    }</span></span>
+<span class="line"><span style="color:#B392F0">  })</span></span>
+<span class="line"><span style="color:#B392F0">}</span></span></code></pre>
+<h2 id="error-handling">Error Handling</h2>
+<h3 id="1-comprehensive-error-handler">1. Comprehensive Error Handler</h3>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> GraphQLErrorHandler {</span></span>
+<span class="line"><span style="color:#B392F0">  handleError(error) {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#B392F0"> (</span><span style="color:#79B8FF">error</span><span style="color:#B392F0">.networkError) {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#B392F0">.handleNetworkError(</span><span style="color:#79B8FF">error</span><span style="color:#B392F0">.networkError)</span></span>
+<span class="line"><span style="color:#B392F0">    }</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#B392F0"> (</span><span style="color:#79B8FF">error</span><span style="color:#B392F0">.graphQLErrors) {</span></span>
+<span class="line"><span style="color:#79B8FF">      error</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">graphQLErrors</span><span style="color:#B392F0">.forEach(err </span><span style="color:#F97583">=></span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#79B8FF">        this</span><span style="color:#B392F0">.handleGraphQLError(err)</span></span>
+<span class="line"><span style="color:#B392F0">      })</span></span>
+<span class="line"><span style="color:#B392F0">    }</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#B392F0">  handleNetworkError(error) {</span></span>
+<span class="line"><span style="color:#79B8FF">    console</span><span style="color:#B392F0">.error(</span><span style="color:#FFAB70">'Network error:'</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> error)</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#B392F0"> (</span><span style="color:#79B8FF">error</span><span style="color:#B392F0">.statusCode </span><span style="color:#F97583">===</span><span style="color:#F8F8F8"> 401</span><span style="color:#B392F0">) {</span></span>
+<span class="line"><span style="color:#6B737C">      // Handle authentication error</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#B392F0">.refreshToken()</span></span>
+<span class="line"><span style="color:#B392F0">    } </span><span style="color:#F97583">else</span><span style="color:#F97583"> if</span><span style="color:#B392F0"> (</span><span style="color:#79B8FF">error</span><span style="color:#B392F0">.statusCode </span><span style="color:#F97583">===</span><span style="color:#F8F8F8"> 429</span><span style="color:#B392F0">) {</span></span>
+<span class="line"><span style="color:#6B737C">      // Handle rate limiting</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#B392F0">.handleRateLimit()</span></span>
+<span class="line"><span style="color:#B392F0">    } </span><span style="color:#F97583">else</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#6B737C">      // Show generic error to user</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#B392F0">.showError(</span><span style="color:#FFAB70">'Network connection failed'</span><span style="color:#B392F0">)</span></span>
+<span class="line"><span style="color:#B392F0">    }</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#B392F0">  handleGraphQLError(error) {</span></span>
+<span class="line"><span style="color:#79B8FF">    console</span><span style="color:#B392F0">.error(</span><span style="color:#FFAB70">'GraphQL error:'</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> error)</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#F97583">    switch</span><span style="color:#B392F0"> (</span><span style="color:#79B8FF">error</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">extensions</span><span style="color:#B392F0">?.code) {</span></span>
+<span class="line"><span style="color:#F97583">      case</span><span style="color:#FFAB70"> 'UNAUTHENTICATED'</span><span style="color:#B392F0">:</span></span>
+<span class="line"><span style="color:#79B8FF">        this</span><span style="color:#B392F0">.redirectToLogin()</span></span>
+<span class="line"><span style="color:#F97583">        break</span></span>
+<span class="line"><span style="color:#F97583">      case</span><span style="color:#FFAB70"> 'FORBIDDEN'</span><span style="color:#B392F0">:</span></span>
+<span class="line"><span style="color:#79B8FF">        this</span><span style="color:#B392F0">.showError(</span><span style="color:#FFAB70">'You do not have permission'</span><span style="color:#B392F0">)</span></span>
+<span class="line"><span style="color:#F97583">        break</span></span>
+<span class="line"><span style="color:#F97583">      case</span><span style="color:#FFAB70"> 'BAD_USER_INPUT'</span><span style="color:#B392F0">:</span></span>
+<span class="line"><span style="color:#79B8FF">        this</span><span style="color:#B392F0">.showError(</span><span style="color:#FFAB70">'Invalid input: '</span><span style="color:#F97583"> +</span><span style="color:#79B8FF"> error</span><span style="color:#B392F0">.message)</span></span>
+<span class="line"><span style="color:#F97583">        break</span></span>
+<span class="line"><span style="color:#F97583">      default</span><span style="color:#B392F0">:</span></span>
+<span class="line"><span style="color:#79B8FF">        this</span><span style="color:#B392F0">.showError(</span><span style="color:#79B8FF">error</span><span style="color:#B392F0">.message)</span></span>
+<span class="line"><span style="color:#B392F0">    }</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#B392F0">  showError(message) {</span></span>
+<span class="line"><span style="color:#6B737C">    // Display error to user</span></span>
+<span class="line"><span style="color:#79B8FF">    console</span><span style="color:#B392F0">.error(message)</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#F97583">  async</span><span style="color:#B392F0"> refreshToken() {</span></span>
+<span class="line"><span style="color:#6B737C">    // Implement token refresh logic</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#B392F0">  handleRateLimit() {</span></span>
+<span class="line"><span style="color:#6B737C">    // Implement backoff strategy</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#B392F0">  redirectToLogin() {</span></span>
+<span class="line"><span style="color:#6B737C">    // Redirect to login page</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> errorHandler</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> GraphQLErrorHandler()</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">// Use with queries</span></span>
+<span class="line"><span style="color:#F97583">try</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#F97583">  const</span><span style="color:#B392F0"> { </span><span style="color:#79B8FF">data</span><span style="color:#B392F0"> } </span><span style="color:#F97583">=</span><span style="color:#F97583"> await</span><span style="color:#79B8FF"> client</span><span style="color:#B392F0">.query({ query</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> GET_OHLCV</span><span style="color:#B392F0"> })</span></span>
+<span class="line"><span style="color:#B392F0">} </span><span style="color:#F97583">catch</span><span style="color:#B392F0"> (error) {</span></span>
+<span class="line"><span style="color:#79B8FF">  errorHandler</span><span style="color:#B392F0">.handleError(error)</span></span>
+<span class="line"><span style="color:#B392F0">}</span></span></code></pre>
+<h2 id="complete-example">Complete Example</h2>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#B392F0"> { ApolloClient</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> InMemoryCache</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> gql } </span><span style="color:#F97583">from</span><span style="color:#FFAB70"> '@apollo/client'</span></span>
+<span class="line"><span style="color:#F97583">import</span><span style="color:#B392F0"> { Chart } </span><span style="color:#F97583">from</span><span style="color:#FFAB70"> 'tradex-chart'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">class</span><span style="color:#B392F0"> GraphQLChartApp {</span></span>
+<span class="line"><span style="color:#F97583">  constructor</span><span style="color:#B392F0">(endpoint) {</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.client </span><span style="color:#F97583">=</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ApolloClient({</span></span>
+<span class="line"><span style="color:#B392F0">      uri</span><span style="color:#F97583">:</span><span style="color:#B392F0"> endpoint</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">      cache</span><span style="color:#F97583">:</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> InMemoryCache()</span></span>
+<span class="line"><span style="color:#B392F0">    })</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.chart </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.subscription </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> null</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#F97583">  async</span><span style="color:#B392F0"> initialize(symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe) {</span></span>
+<span class="line"><span style="color:#6B737C">    // Load initial data</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> ohlcv</span><span style="color:#F97583"> =</span><span style="color:#F97583"> await</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.fetchInitialData(symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe)</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#6B737C">    // Create chart</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.chart </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> document</span><span style="color:#B392F0">.createElement(</span><span style="color:#FFAB70">'tradex-chart'</span><span style="color:#B392F0">)</span></span>
+<span class="line"><span style="color:#79B8FF">    document</span><span style="color:#B392F0">.getElementById(</span><span style="color:#FFAB70">'chart'</span><span style="color:#B392F0">).appendChild(</span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.chart)</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.start({</span></span>
+<span class="line"><span style="color:#B392F0">      title</span><span style="color:#F97583">:</span><span style="color:#B392F0"> symbol</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">      state</span><span style="color:#F97583">:</span><span style="color:#B392F0"> { ohlcv }</span></span>
+<span class="line"><span style="color:#B392F0">    })</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#6B737C">    // Subscribe to real-time updates</span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.subscribeToUpdates(symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe)</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#F97583">  async</span><span style="color:#B392F0"> fetchInitialData(symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> query</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> gql</span><span style="color:#FFAB70">`</span></span>
+<span class="line"><span style="color:#FFAB70">      query GetOHLCV($symbol: String!, $timeframe: String!, $limit: Int!) {</span></span>
+<span class="line"><span style="color:#FFAB70">        ohlcv(symbol: $symbol, timeframe: $timeframe, limit: $limit) {</span></span>
+<span class="line"><span style="color:#FFAB70">          timestamp open high low close volume</span></span>
+<span class="line"><span style="color:#FFAB70">        }</span></span>
+<span class="line"><span style="color:#FFAB70">      }</span></span>
+<span class="line"><span style="color:#FFAB70">    `</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#B392F0"> { </span><span style="color:#79B8FF">data</span><span style="color:#B392F0"> } </span><span style="color:#F97583">=</span><span style="color:#F97583"> await</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">client</span><span style="color:#B392F0">.query({</span></span>
+<span class="line"><span style="color:#B392F0">      query</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">      variables</span><span style="color:#F97583">:</span><span style="color:#B392F0"> { symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> limit</span><span style="color:#F97583">:</span><span style="color:#F8F8F8"> 500</span><span style="color:#B392F0"> }</span></span>
+<span class="line"><span style="color:#B392F0">    })</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#F97583">    return</span><span style="color:#79B8FF"> data</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">ohlcv</span><span style="color:#B392F0">.map(c </span><span style="color:#F97583">=></span><span style="color:#B392F0"> [</span></span>
+<span class="line"><span style="color:#79B8FF">      c</span><span style="color:#B392F0">.timestamp</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> c</span><span style="color:#B392F0">.open</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> c</span><span style="color:#B392F0">.high</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> c</span><span style="color:#B392F0">.low</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> c</span><span style="color:#B392F0">.close</span><span style="color:#BBBBBB">,</span><span style="color:#79B8FF"> c</span><span style="color:#B392F0">.volume</span></span>
+<span class="line"><span style="color:#B392F0">    ])</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#B392F0">  subscribeToUpdates(symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe) {</span></span>
+<span class="line"><span style="color:#F97583">    const</span><span style="color:#79B8FF"> subscription</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> gql</span><span style="color:#FFAB70">`</span></span>
+<span class="line"><span style="color:#FFAB70">      subscription OnCandleUpdate($symbol: String!, $timeframe: String!) {</span></span>
+<span class="line"><span style="color:#FFAB70">        candleUpdated(symbol: $symbol, timeframe: $timeframe) {</span></span>
+<span class="line"><span style="color:#FFAB70">          timestamp open high low close volume isClosed</span></span>
+<span class="line"><span style="color:#FFAB70">        }</span></span>
+<span class="line"><span style="color:#FFAB70">      }</span></span>
+<span class="line"><span style="color:#FFAB70">    `</span></span>
+<span class="line"><span style="color:#B392F0">    </span></span>
+<span class="line"><span style="color:#79B8FF">    this</span><span style="color:#B392F0">.subscription </span><span style="color:#F97583">=</span><span style="color:#79B8FF"> this</span><span style="color:#B392F0">.client</span></span>
+<span class="line"><span style="color:#B392F0">      .subscribe({</span></span>
+<span class="line"><span style="color:#B392F0">        query</span><span style="color:#F97583">:</span><span style="color:#B392F0"> subscription</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        variables</span><span style="color:#F97583">:</span><span style="color:#B392F0"> { symbol</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> timeframe }</span></span>
+<span class="line"><span style="color:#B392F0">      })</span></span>
+<span class="line"><span style="color:#B392F0">      .subscribe({</span></span>
+<span class="line"><span style="color:#B392F0">        next</span><span style="color:#F97583">:</span><span style="color:#B392F0"> ({ data }) </span><span style="color:#F97583">=></span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#F97583">          const</span><span style="color:#79B8FF"> candle</span><span style="color:#F97583"> =</span><span style="color:#79B8FF"> data</span><span style="color:#B392F0">.candleUpdated</span></span>
+<span class="line"><span style="color:#F97583">          const</span><span style="color:#79B8FF"> formatted</span><span style="color:#F97583"> =</span><span style="color:#B392F0"> [</span></span>
+<span class="line"><span style="color:#79B8FF">            candle</span><span style="color:#B392F0">.timestamp</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">            candle</span><span style="color:#B392F0">.open</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">            candle</span><span style="color:#B392F0">.high</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">            candle</span><span style="color:#B392F0">.low</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">            candle</span><span style="color:#B392F0">.close</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#79B8FF">            candle</span><span style="color:#B392F0">.volume</span></span>
+<span class="line"><span style="color:#B392F0">          ]</span></span>
+<span class="line"><span style="color:#B392F0">          </span></span>
+<span class="line"><span style="color:#F97583">          if</span><span style="color:#B392F0"> (</span><span style="color:#79B8FF">candle</span><span style="color:#B392F0">.isClosed) {</span></span>
+<span class="line"><span style="color:#79B8FF">            this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.addCandle(formatted)</span></span>
+<span class="line"><span style="color:#B392F0">          } </span><span style="color:#F97583">else</span><span style="color:#B392F0"> {</span></span>
+<span class="line"><span style="color:#79B8FF">            this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">chart</span><span style="color:#B392F0">.updateStreamingCandle(formatted)</span></span>
+<span class="line"><span style="color:#B392F0">          }</span></span>
+<span class="line"><span style="color:#B392F0">        }</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">        error</span><span style="color:#F97583">:</span><span style="color:#B392F0"> (error) </span><span style="color:#F97583">=></span><span style="color:#79B8FF"> console</span><span style="color:#B392F0">.error(</span><span style="color:#FFAB70">'Subscription error:'</span><span style="color:#BBBBBB">,</span><span style="color:#B392F0"> error)</span></span>
+<span class="line"><span style="color:#B392F0">      })</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">  </span></span>
+<span class="line"><span style="color:#B392F0">  destroy() {</span></span>
+<span class="line"><span style="color:#F97583">    if</span><span style="color:#B392F0"> (</span><span style="color:#79B8FF">this</span><span style="color:#B392F0">.subscription) {</span></span>
+<span class="line"><span style="color:#79B8FF">      this</span><span style="color:#B392F0">.</span><span style="color:#79B8FF">subscription</span><span style="color:#B392F0">.unsubscribe()</span></span>
+<span class="line"><span style="color:#B392F0">    }</span></span>
+<span class="line"><span style="color:#B392F0">  }</span></span>
+<span class="line"><span style="color:#B392F0">}</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">// Usage</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> app</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> GraphQLChartApp(</span><span style="color:#FFAB70">'https://api.example.com/graphql'</span><span style="color:#B392F0">)</span></span>
+<span class="line"><span style="color:#F97583">await</span><span style="color:#79B8FF"> app</span><span style="color:#B392F0">.initialize(</span><span style="color:#FFAB70">'BTCUSDT'</span><span style="color:#BBBBBB">,</span><span style="color:#FFAB70"> '1h'</span><span style="color:#B392F0">)</span></span></code></pre>
+<h2 id="best-practices">Best Practices</h2>
+<h3 id="1-use-persisted-queries">1. Use Persisted Queries</h3>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> client</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> ApolloClient({</span></span>
+<span class="line"><span style="color:#B392F0">  uri</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'https://api.example.com/graphql'</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">  cache</span><span style="color:#F97583">:</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> InMemoryCache()</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">  link</span><span style="color:#F97583">:</span><span style="color:#B392F0"> createPersistedQueryLink().concat(httpLink)</span></span>
+<span class="line"><span style="color:#B392F0">})</span></span></code></pre>
+<h3 id="2-implement-query-batching">2. Implement Query Batching</h3>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#F97583">import</span><span style="color:#B392F0"> { BatchHttpLink } </span><span style="color:#F97583">from</span><span style="color:#FFAB70"> '@apollo/client/link/batch-http'</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#79B8FF"> link</span><span style="color:#F97583"> =</span><span style="color:#F97583"> new</span><span style="color:#B392F0"> BatchHttpLink({</span></span>
+<span class="line"><span style="color:#B392F0">  uri</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'https://api.example.com/graphql'</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">  batchMax</span><span style="color:#F97583">:</span><span style="color:#F8F8F8"> 5</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">  batchInterval</span><span style="color:#F97583">:</span><span style="color:#F8F8F8"> 20</span></span>
+<span class="line"><span style="color:#B392F0">})</span></span></code></pre>
+<h3 id="3-cache-management">3. Cache Management</h3>
+<pre class="astro-code min-dark" style="background-color:#1f1f1f;color:#b392f0; overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;" tabindex="0"><code><span class="line"><span style="color:#6B737C">// Cache first, then network</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> { </span><span style="color:#79B8FF">data</span><span style="color:#B392F0"> } </span><span style="color:#F97583">=</span><span style="color:#F97583"> await</span><span style="color:#79B8FF"> client</span><span style="color:#B392F0">.query({</span></span>
+<span class="line"><span style="color:#B392F0">  query</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> GET_OHLCV</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">  fetchPolicy</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'cache-first'</span></span>
+<span class="line"><span style="color:#B392F0">})</span></span>
+<span class="line"></span>
+<span class="line"><span style="color:#6B737C">// Network only for real-time data</span></span>
+<span class="line"><span style="color:#F97583">const</span><span style="color:#B392F0"> { </span><span style="color:#79B8FF">data</span><span style="color:#B392F0"> } </span><span style="color:#F97583">=</span><span style="color:#F97583"> await</span><span style="color:#79B8FF"> client</span><span style="color:#B392F0">.query({</span></span>
+<span class="line"><span style="color:#B392F0">  query</span><span style="color:#F97583">:</span><span style="color:#79B8FF"> GET_LATEST</span><span style="color:#BBBBBB">,</span></span>
+<span class="line"><span style="color:#B392F0">  fetchPolicy</span><span style="color:#F97583">:</span><span style="color:#FFAB70"> 'network-only'</span></span>
+<span class="line"><span style="color:#B392F0">})</span></span></code></pre>
+<h2 id="related-documentation">Related Documentation</h2>
+<ul>
+<li><a href="rest-api-integration">REST API Integration</a> - Alternative API approach</li>
+<li><a href="websocket-integration">WebSocket Integration</a> - Direct WebSocket connections</li>
+<li><a href="data-caching-strategies">Data Caching</a> - Optimize data fetching</li>
+<li><a href="../../reference/state">State Management</a> - Chart state handling</li>
+</ul></div><footer class="astro-3yyafb3n"><div class="meta sl-flex astro-3yyafb3n"></div><div class="pagination-links sl-flex astro-u2l5gyhi" dir="ltr"><a href="/guides/backend/data-caching-strategies/" rel="prev" class="astro-u2l5gyhi"><svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17 11H9.41l3.3-3.29a1.004 1.004 0 1 0-1.42-1.42l-5 5a1 1 0 0 0-.21.33 1 1 0 0 0 0 .76 1 1 0 0 0 .21.33l5 5a1.002 1.002 0 0 0 1.639-.325 1 1 0 0 0-.219-1.095L9.41 13H17a1 1 0 0 0 0-2Z"/></svg><span class="astro-u2l5gyhi">Previous<br class="astro-u2l5gyhi"><span class="link-title astro-u2l5gyhi">Data Caching Strategies</span></span></a><a href="/guides/backend/rest-api-integration/" rel="next" class="astro-u2l5gyhi"><svg aria-hidden="true" class="astro-u2l5gyhi astro-c6vsoqas" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="--sl-icon-size: 1.5rem;"><path d="M17.92 11.62a1.001 1.001 0 0 0-.21-.33l-5-5a1.003 1.003 0 1 0-1.42 1.42l3.3 3.29H7a1 1 0 0 0 0 2h7.59l-3.3 3.29a1.002 1.002 0 0 0 .325 1.639 1 1 0 0 0 1.095-.219l5-5a1 1 0 0 0 .21-.33 1 1 0 0 0 0-.76Z"/></svg><span class="astro-u2l5gyhi">Next<br class="astro-u2l5gyhi"><span class="link-title astro-u2l5gyhi">REST API Integration</span></span></a></div></footer></div></div></main></div></div></div></div></body></html>

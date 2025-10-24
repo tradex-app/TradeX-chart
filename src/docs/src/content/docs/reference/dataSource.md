@@ -1,5 +1,6 @@
 ---
-Data source
+title: Data Source
+description: Managing data flow for TradeX charts
 ---
 
 # DataSource

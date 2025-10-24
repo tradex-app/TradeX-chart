@@ -1,0 +1,518 @@
+---
+title: Export Chart Image
+description: Export charts as PNG, SVG, or PDF images
+---
+
+# Export Chart Image
+
+Export TradeX charts as high-quality images in various formats for sharing and reporting.
+
+## Basic PNG Export
+
+```javascript
+function exportChartAsPNG(chart, filename = 'chart.png') {
+  const canvas = chart.getCanvas()
+  
+  canvas.toBlob((blob) => {
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    URL.revokeObjectURL(url)
+  })
+}
+
+// Usage
+const chart = document.getElementById('chart')
+exportChartAsPNG(chart, 'btc-chart.png')
+```
+
+## High-Resolution Export
+
+```javascript
+function exportHighResChart(chart, scale = 2, filename = 'chart-hd.png') {
+  const canvas = chart.getCanvas()
+  const ctx = canvas.getContext('2d')
+  
+  // Create high-res canvas
+  const hdCanvas = document.createElement('canvas')
+  hdCanvas.width = canvas.width * scale
+  hdCanvas.height = canvas.height * scale
+  
+  const hdCtx = hdCanvas.getContext('2d')
+  hdCtx.scale(scale, scale)
+  hdCtx.drawImage(canvas, 0, 0)
+  
+  // Export
+  hdCanvas.toBlob((blob) => {
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    URL.revokeObjectURL(url)
+  })
+}
+
+// Export at 2x resolution
+exportHighResChart(chart, 2, 'chart-2x.png')
+
+// Export at 4x resolution
+exportHighResChart(chart, 4, 'chart-4x.png')
+```
+
+## SVG Export
+
+```javascript
+function exportChartAsSVG(chart, filename = 'chart.svg') {
+  const canvas = chart.getCanvas()
+  const width = canvas.width
+  const height = canvas.height
+  
+  // Create SVG
+  const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" 
+         xmlns:xlink="http://www.w3.org/1999/xlink"
+         width="${width}" 
+         height="${height}">
+      <image width="${width}" height="${height}" 
+             xlink:href="${canvas.toDataURL()}"/>
+    </svg>
+  `
+  
+  const blob = new Blob([svg], { type: 'image/svg+xml' })
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
+// Usage
+exportChartAsSVG(chart, 'chart.svg')
+```
+
+## PDF Export
+
+```javascript
+// Using jsPDF library
+import jsPDF from 'jspdf'
+
+function exportChartAsPDF(chart, filename = 'chart.pdf') {
+  const canvas = chart.getCanvas()
+  const imgData = canvas.toDataURL('image/png')
+  
+  // Create PDF
+  const pdf = new jsPDF({
+    orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+    unit: 'px',
+    format: [canvas.width, canvas.height]
+  })
+  
+  pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height)
+  pdf.save(filename)
+}
+
+// Usage
+exportChartAsPDF(chart, 'chart.pdf')
+```
+
+## Export with Watermark
+
+```javascript
+function exportWithWatermark(chart, watermarkText, filename = 'chart.png') {
+  const canvas = chart.getCanvas()
+  const tempCanvas = document.createElement('canvas')
+  tempCanvas.width = canvas.width
+  tempCanvas.height = canvas.height
+  
+  const ctx = tempCanvas.getContext('2d')
+  
+  // Draw original chart
+  ctx.drawImage(canvas, 0, 0)
+  
+  // Add watermark
+  ctx.save()
+  ctx.globalAlpha = 0.3
+  ctx.font = '48px Arial'
+  ctx.fillStyle = '#888'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'middle'
+  ctx.translate(tempCanvas.width / 2, tempCanvas.height / 2)
+  ctx.rotate(-Math.PI / 4)
+  ctx.fillText(watermarkText, 0, 0)
+  ctx.restore()
+  
+  // Export
+  tempCanvas.toBlob((blob) => {
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    URL.revokeObjectURL(url)
+  })
+}
+
+// Usage
+exportWithWatermark(chart, 'TradeX Chart', 'chart-watermark.png')
+```
+
+## Export with Custom Dimensions
+
+```javascript
+function exportCustomSize(chart, width, height, filename = 'chart.png') {
+  const canvas = chart.getCanvas()
+  const tempCanvas = document.createElement('canvas')
+  tempCanvas.width = width
+  tempCanvas.height = height
+  
+  const ctx = tempCanvas.getContext('2d')
+  ctx.drawImage(canvas, 0, 0, width, height)
+  
+  tempCanvas.toBlob((blob) => {
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    URL.revokeObjectURL(url)
+  })
+}
+
+// Export as 1920x1080
+exportCustomSize(chart, 1920, 1080, 'chart-hd.png')
+
+// Export as 3840x2160 (4K)
+exportCustomSize(chart, 3840, 2160, 'chart-4k.png')
+```
+
+## Export Manager Class
+
+```javascript
+class ChartExporter {
+  constructor(chart) {
+    this.chart = chart
+  }
+
+  async exportPNG(options = {}) {
+    const {
+      filename = 'chart.png',
+      scale = 1,
+      quality = 0.92
+    } = options
+
+    const canvas = this.getScaledCanvas(scale)
+    const blob = await this.canvasToBlob(canvas, 'image/png', quality)
+    this.downloadBlob(blob, filename)
+  }
+
+  async exportJPEG(options = {}) {
+    const {
+      filename = 'chart.jpg',
+      scale = 1,
+      quality = 0.92,
+      backgroundColor = '#ffffff'
+    } = options
+
+    const canvas = this.getScaledCanvas(scale, backgroundColor)
+    const blob = await this.canvasToBlob(canvas, 'image/jpeg', quality)
+    this.downloadBlob(blob, filename)
+  }
+
+  async exportSVG(filename = 'chart.svg') {
+    const canvas = this.chart.getCanvas()
+    const dataUrl = canvas.toDataURL()
+    
+    const svg = `
+      <svg xmlns="http://www.w3.org/2000/svg" 
+           xmlns:xlink="http://www.w3.org/1999/xlink"
+           width="${canvas.width}" 
+           height="${canvas.height}">
+        <image width="${canvas.width}" height="${canvas.height}" 
+               xlink:href="${dataUrl}"/>
+      </svg>
+    `
+    
+    const blob = new Blob([svg], { type: 'image/svg+xml' })
+    this.downloadBlob(blob, filename)
+  }
+
+  async exportPDF(filename = 'chart.pdf') {
+    const canvas = this.chart.getCanvas()
+    const imgData = canvas.toDataURL('image/png')
+    
+    const pdf = new jsPDF({
+      orientation: canvas.width > canvas.height ? 'landscape' : 'portrait',
+      unit: 'px',
+      format: [canvas.width, canvas.height]
+    })
+    
+    pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height)
+    pdf.save(filename)
+  }
+
+  getScaledCanvas(scale = 1, backgroundColor = null) {
+    const canvas = this.chart.getCanvas()
+    const scaledCanvas = document.createElement('canvas')
+    scaledCanvas.width = canvas.width * scale
+    scaledCanvas.height = canvas.height * scale
+    
+    const ctx = scaledCanvas.getContext('2d')
+    
+    // Fill background if specified
+    if (backgroundColor) {
+      ctx.fillStyle = backgroundColor
+      ctx.fillRect(0, 0, scaledCanvas.width, scaledCanvas.height)
+    }
+    
+    ctx.scale(scale, scale)
+    ctx.drawImage(canvas, 0, 0)
+    
+    return scaledCanvas
+  }
+
+  canvasToBlob(canvas, type, quality) {
+    return new Promise((resolve) => {
+      canvas.toBlob(resolve, type, quality)
+    })
+  }
+
+  downloadBlob(blob, filename) {
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = filename
+    link.click()
+    URL.revokeObjectURL(url)
+  }
+
+  copyToClipboard() {
+    const canvas = this.chart.getCanvas()
+    
+    canvas.toBlob(async (blob) => {
+      try {
+        await navigator.clipboard.write([
+          new ClipboardItem({ 'image/png': blob })
+        ])
+        console.log('Chart copied to clipboard')
+      } catch (error) {
+        console.error('Failed to copy to clipboard:', error)
+      }
+    })
+  }
+}
+
+// Usage
+const exporter = new ChartExporter(chart)
+
+// Export PNG
+exporter.exportPNG({ filename: 'chart.png', scale: 2 })
+
+// Export JPEG
+exporter.exportJPEG({ filename: 'chart.jpg', quality: 0.9 })
+
+// Export SVG
+exporter.exportSVG('chart.svg')
+
+// Export PDF
+exporter.exportPDF('chart.pdf')
+
+// Copy to clipboard
+exporter.copyToClipboard()
+```
+
+## Export UI Component
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .export-menu {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 15px;
+    }
+    .export-button {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: left;
+    }
+    .export-button:hover {
+      background: #f5f5f5;
+    }
+    .export-options {
+      margin-top: 10px;
+      padding-top: 10px;
+      border-top: 1px solid #ddd;
+    }
+    .export-options label {
+      display: block;
+      margin: 5px 0;
+      font-size: 12px;
+    }
+    .export-options input,
+    .export-options select {
+      width: 100%;
+      padding: 5px;
+      margin-top: 3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="export-menu">
+    <h3>Export Chart</h3>
+    
+    <button class="export-button" onclick="exportAs('png')">📷 Export as PNG</button>
+    <button class="export-button" onclick="exportAs('jpeg')">🖼️ Export as JPEG</button>
+    <button class="export-button" onclick="exportAs('svg')">📐 Export as SVG</button>
+    <button class="export-button" onclick="exportAs('pdf')">📄 Export as PDF</button>
+    <button class="export-button" onclick="copyToClipboard()">📋 Copy to Clipboard</button>
+    
+    <div class="export-options">
+      <label>
+        Scale:
+        <select id="export-scale">
+          <option value="1">1x</option>
+          <option value="2" selected>2x</option>
+          <option value="3">3x</option>
+          <option value="4">4x</option>
+        </select>
+      </label>
+      
+      <label>
+        Quality:
+        <input type="range" id="export-quality" min="0.1" max="1" step="0.1" value="0.9">
+        <span id="quality-value">0.9</span>
+      </label>
+    </div>
+  </div>
+
+  <tradex-chart id="chart"></tradex-chart>
+
+  <script>
+    const chart = document.getElementById('chart')
+    const exporter = new ChartExporter(chart)
+
+    // Update quality display
+    document.getElementById('export-quality').addEventListener('input', (e) => {
+      document.getElementById('quality-value').textContent = e.target.value
+    })
+
+    function exportAs(format) {
+      const scale = parseInt(document.getElementById('export-scale').value)
+      const quality = parseFloat(document.getElementById('export-quality').value)
+      const filename = `chart-${Date.now()}.${format}`
+
+      switch (format) {
+        case 'png':
+          exporter.exportPNG({ filename, scale, quality })
+          break
+        case 'jpeg':
+          exporter.exportJPEG({ filename, scale, quality })
+          break
+        case 'svg':
+          exporter.exportSVG(filename)
+          break
+        case 'pdf':
+          exporter.exportPDF(filename)
+          break
+      }
+    }
+
+    function copyToClipboard() {
+      exporter.copyToClipboard()
+      alert('Chart copied to clipboard!')
+    }
+  </script>
+</body>
+</html>
+```
+
+## React Export Component
+
+```jsx
+import { useState } from 'react'
+
+function ChartExportMenu({ chart }) {
+  const [scale, setScale] = useState(2)
+  const [quality, setQuality] = useState(0.9)
+  const exporter = new ChartExporter(chart)
+
+  const handleExport = (format) => {
+    const filename = `chart-${Date.now()}.${format}`
+    
+    switch (format) {
+      case 'png':
+        exporter.exportPNG({ filename, scale, quality })
+        break
+      case 'jpeg':
+        exporter.exportJPEG({ filename, scale, quality })
+        break
+      case 'svg':
+        exporter.exportSVG(filename)
+        break
+      case 'pdf':
+        exporter.exportPDF(filename)
+        break
+    }
+  }
+
+  return (
+    <div className="export-menu">
+      <h3>Export Chart</h3>
+      
+      <button onClick={() => handleExport('png')}>📷 Export as PNG</button>
+      <button onClick={() => handleExport('jpeg')}>🖼️ Export as JPEG</button>
+      <button onClick={() => handleExport('svg')}>📐 Export as SVG</button>
+      <button onClick={() => handleExport('pdf')}>📄 Export as PDF</button>
+      <button onClick={() => exporter.copyToClipboard()}>📋 Copy</button>
+      
+      <div className="export-options">
+        <label>
+          Scale:
+          <select value={scale} onChange={(e) => setScale(Number(e.target.value))}>
+            <option value={1}>1x</option>
+            <option value={2}>2x</option>
+            <option value={3}>3x</option>
+            <option value={4}>4x</option>
+          </select>
+        </label>
+        
+        <label>
+          Quality: {quality}
+          <input
+            type="range"
+            min="0.1"
+            max="1"
+            step="0.1"
+            value={quality}
+            onChange={(e) => setQuality(Number(e.target.value))}
+          />
+        </label>
+      </div>
+    </div>
+  )
+}
+
+export default ChartExportMenu
+```
+
+## Related Documentation
+
+- [API Reference](../api/export-chart-image) - Export API
+- [Configuration](../reference/02_configuration) - Chart configuration
+- [Examples](../examples) - More examples

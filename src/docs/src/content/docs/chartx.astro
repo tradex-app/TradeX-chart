@@ -24,13 +24,26 @@
     state: state,
   }
 
-  const chart = document.createElement("tradex-chart")
-  const chartDiv = document.getElementById("chart")
-        chartDiv?.appendChild(chart)
-        chart.start(config)
-        chart.addIndicator("EMA")
-        chart.addIndicator("RSI")
+  try {
+    const chart = document.createElement("tradex-chart")
+    const chartDiv = document.getElementById("chart")
+    
+    if (chartDiv) {
+      chartDiv.appendChild(chart)
+      chart.start(config)
+      chart.addIndicator("EMA")
+      chart.addIndicator("RSI")
+      
+      // Expose chart instance for debugging
+      if (typeof window !== 'undefined') {
         window.chart0 = chart
+      }
+    } else {
+      console.error('Chart container element not found')
+    }
+  } catch (error) {
+    console.error('Failed to initialize TradeX Chart:', error)
+  }
 </script>
 <style>
   #chart {

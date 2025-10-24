@@ -1,0 +1,522 @@
+---
+title: Mobile Responsive
+description: Create mobile-friendly responsive charts with touch support
+---
+
+# Mobile Responsive Charts
+
+Optimize TradeX Chart for mobile devices with responsive layouts and touch interactions.
+
+## Responsive Container
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+    }
+    
+    .chart-container {
+      width: 100%;
+      height: 100vh;
+      position: relative;
+    }
+    
+    tradex-chart {
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* Mobile adjustments */
+    @media (max-width: 768px) {
+      .chart-container {
+        height: 60vh;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="chart-container">
+    <tradex-chart id="chart"></tradex-chart>
+  </div>
+</body>
+</html>
+```
+
+## Touch Gestures
+
+```javascript
+class MobileChartController {
+  constructor(chart) {
+    this.chart = chart
+    this.setupTouchHandlers()
+  }
+
+  setupTouchHandlers() {
+    const element = this.chart.getElement()
+    
+    // Pinch to zoom
+    let lastDistance = 0
+    
+    element.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 2) {
+        lastDistance = this.getDistance(e.touches[0], e.touches[1])
+      }
+    })
+    
+    element.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 2) {
+        e.preventDefault()
+        const distance = this.getDistance(e.touches[0], e.touches[1])
+        const scale = distance / lastDistance
+        
+        this.chart.zoom(scale)
+        lastDistance = distance
+      }
+    })
+    
+    // Swipe to scroll
+    let startX = 0
+    let startY = 0
+    
+    element.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        startX = e.touches[0].clientX
+        startY = e.touches[0].clientY
+      }
+    })
+    
+    element.addEventListener('touchmove', (e) => {
+      if (e.touches.length === 1) {
+        const deltaX = e.touches[0].clientX - startX
+        const deltaY = e.touches[0].clientY - startY
+        
+        // Horizontal scroll
+        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+          e.preventDefault()
+          this.chart.scroll(deltaX)
+          startX = e.touches[0].clientX
+        }
+      }
+    })
+  }
+
+  getDistance(touch1, touch2) {
+    const dx = touch1.clientX - touch2.clientX
+    const dy = touch1.clientY - touch2.clientY
+    return Math.sqrt(dx * dx + dy * dy)
+  }
+}
+
+// Usage
+const chart = document.getElementById('chart')
+const mobileController = new MobileChartController(chart)
+```
+
+## Responsive Configuration
+
+```javascript
+function getResponsiveConfig() {
+  const isMobile = window.innerWidth < 768
+  const isTablet = window.innerWidth >= 768 && window.innerWidth < 1024
+  
+  return {
+    // Adjust based on device
+    candleWidth: isMobile ? 4 : isTablet ? 6 : 8,
+    
+    // Disable features on mobile for performance
+    crosshair: !isMobile,
+    tooltip: !isMobile,
+    animations: !isMobile,
+    
+    // Touch settings
+    touch: {
+      enabled: true,
+      pinchZoom: true,
+      swipeScroll: true,
+      doubleTapZoom: true
+    },
+    
+    // Adjust font sizes
+    xAxis: {
+      fontSize: isMobile ? 10 : 12,
+      height: isMobile ? 25 : 30
+    },
+    
+    yAxis: {
+      fontSize: isMobile ? 10 : 12,
+      width: isMobile ? 60 : 80
+    },
+    
+    // Reduce indicators on mobile
+    maxIndicators: isMobile ? 2 : 5
+  }
+}
+
+// Apply configuration
+const chart = document.getElementById('chart')
+chart.start(getResponsiveConfig())
+
+// Update on resize
+window.addEventListener('resize', () => {
+  chart.updateConfig(getResponsiveConfig())
+})
+```
+
+## Mobile-Optimized Layout
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    .mobile-layout {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+    }
+    
+    .header {
+      padding: 10px;
+      background: #f5f5f5;
+      border-bottom: 1px solid #ddd;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .symbol {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .price {
+      font-size: 16px;
+      color: #26a69a;
+    }
+    
+    .chart-area {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .controls {
+      padding: 10px;
+      background: #f5f5f5;
+      border-top: 1px solid #ddd;
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+    }
+    
+    .control-btn {
+      padding: 8px 16px;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 4px;
+      white-space: nowrap;
+      font-size: 14px;
+    }
+    
+    .control-btn.active {
+      background: #2196F3;
+      color: white;
+      border-color: #2196F3;
+    }
+  </style>
+</head>
+<body>
+  <div class="mobile-layout">
+    <div class="header">
+      <div class="symbol">BTC/USDT</div>
+      <div class="price" id="current-price">$45,000</div>
+    </div>
+    
+    <div class="chart-area">
+      <tradex-chart id="chart"></tradex-chart>
+    </div>
+    
+    <div class="controls">
+      <button class="control-btn active" data-timeframe="1m">1m</button>
+      <button class="control-btn" data-timeframe="5m">5m</button>
+      <button class="control-btn" data-timeframe="15m">15m</button>
+      <button class="control-btn" data-timeframe="1h">1h</button>
+      <button class="control-btn" data-timeframe="4h">4h</button>
+      <button class="control-btn" data-timeframe="1d">1D</button>
+    </div>
+  </div>
+
+  <script>
+    const chart = document.getElementById('chart')
+    const mobileController = new MobileChartController(chart)
+    
+    // Timeframe switching
+    document.querySelectorAll('.control-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.control-btn').forEach(b => b.classList.remove('active'))
+        btn.classList.add('active')
+        
+        const timeframe = btn.dataset.timeframe
+        loadChartData(timeframe)
+      })
+    })
+    
+    // Update price display
+    chart.on('update', () => {
+      const price = chart.getCurrentPrice()
+      document.getElementById('current-price').textContent = `$${price.toLocaleString()}`
+    })
+  </script>
+</body>
+</html>
+```
+
+## React Mobile Component
+
+```jsx
+import { useEffect, useRef, useState } from 'react'
+import { useMediaQuery } from 'react-responsive'
+
+function MobileChart({ symbol, data }) {
+  const chartRef = useRef(null)
+  const [timeframe, setTimeframe] = useState('1h')
+  const isMobile = useMediaQuery({ maxWidth: 768 })
+  const isTablet = useMediaQuery({ minWidth: 768, maxWidth: 1024 })
+
+  useEffect(() => {
+    if (!chartRef.current) return
+
+    const config = {
+      title: symbol,
+      state: { ohlcv: data },
+      candleWidth: isMobile ? 4 : isTablet ? 6 : 8,
+      crosshair: !isMobile,
+      tooltip: !isMobile,
+      animations: !isMobile,
+      touch: {
+        enabled: true,
+        pinchZoom: true,
+        swipeScroll: true
+      },
+      xAxis: {
+        fontSize: isMobile ? 10 : 12,
+        height: isMobile ? 25 : 30
+      },
+      yAxis: {
+        fontSize: isMobile ? 10 : 12,
+        width: isMobile ? 60 : 80
+      }
+    }
+
+    chartRef.current.start(config)
+
+    if (isMobile) {
+      new MobileChartController(chartRef.current)
+    }
+  }, [symbol, data, isMobile, isTablet])
+
+  return (
+    <div className="mobile-chart-container">
+      <div className="header">
+        <h2>{symbol}</h2>
+      </div>
+      
+      <div className="chart-wrapper">
+        <tradex-chart ref={chartRef} />
+      </div>
+      
+      <div className="timeframe-selector">
+        {['1m', '5m', '15m', '1h', '4h', '1d'].map(tf => (
+          <button
+            key={tf}
+            className={timeframe === tf ? 'active' : ''}
+            onClick={() => setTimeframe(tf)}
+          >
+            {tf}
+          </button>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default MobileChart
+```
+
+## Performance Optimization for Mobile
+
+```javascript
+class MobileOptimizer {
+  constructor(chart) {
+    this.chart = chart
+    this.isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent)
+    
+    if (this.isMobile) {
+      this.applyOptimizations()
+    }
+  }
+
+  applyOptimizations() {
+    // Reduce data points
+    this.limitDataPoints()
+    
+    // Throttle updates
+    this.throttleUpdates()
+    
+    // Disable expensive features
+    this.disableExpensiveFeatures()
+    
+    // Use passive event listeners
+    this.usePassiveListeners()
+  }
+
+  limitDataPoints() {
+    const MAX_MOBILE_CANDLES = 200
+    const data = this.chart.getData()
+    
+    if (data.length > MAX_MOBILE_CANDLES) {
+      this.chart.setData(data.slice(-MAX_MOBILE_CANDLES))
+    }
+  }
+
+  throttleUpdates() {
+    let lastUpdate = 0
+    const THROTTLE_MS = 100
+    
+    const originalUpdate = this.chart.update.bind(this.chart)
+    
+    this.chart.update = (data) => {
+      const now = Date.now()
+      if (now - lastUpdate > THROTTLE_MS) {
+        originalUpdate(data)
+        lastUpdate = now
+      }
+    }
+  }
+
+  disableExpensiveFeatures() {
+    this.chart.setConfig({
+      animations: false,
+      crosshair: false,
+      tooltip: false,
+      gridLines: { style: 'solid' } // Dashed lines are slower
+    })
+  }
+
+  usePassiveListeners() {
+    const element = this.chart.getElement()
+    
+    element.addEventListener('touchstart', this.handleTouch, { passive: true })
+    element.addEventListener('touchmove', this.handleTouch, { passive: true })
+  }
+
+  handleTouch(e) {
+    // Handle touch events
+  }
+}
+
+// Usage
+const chart = document.getElementById('chart')
+const optimizer = new MobileOptimizer(chart)
+```
+
+## Orientation Change Handling
+
+```javascript
+function handleOrientationChange(chart) {
+  window.addEventListener('orientationchange', () => {
+    setTimeout(() => {
+      // Resize chart after orientation change
+      chart.resize()
+      
+      // Adjust configuration based on orientation
+      const isPortrait = window.innerHeight > window.innerWidth
+      
+      chart.updateConfig({
+        xAxis: {
+          height: isPortrait ? 25 : 30
+        },
+        yAxis: {
+          width: isPortrait ? 60 : 80
+        }
+      })
+    }, 100)
+  })
+}
+
+// Usage
+handleOrientationChange(chart)
+```
+
+## PWA Support
+
+```javascript
+// manifest.json
+{
+  "name": "TradeX Chart",
+  "short_name": "TradeX",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#2196F3",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
+
+// service-worker.js
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open('tradex-v1').then((cache) => {
+      return cache.addAll([
+        '/',
+        '/index.html',
+        '/chart.js',
+        '/styles.css'
+      ])
+    })
+  )
+})
+
+self.addEventListener('fetch', (event) => {
+  event.respondWith(
+    caches.match(event.request).then((response) => {
+      return response || fetch(event.request)
+    })
+  )
+})
+```
+
+## Related Documentation
+
+- [API Reference](../api/mobile-responsive) - Mobile API
+- [Performance](../guides/performance) - Performance optimization
+- [Touch Events](../reference/events) - Touch event handling
+- [Examples](../examples) - More examples

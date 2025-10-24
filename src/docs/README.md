@@ -1,51 +1,55 @@
-# Starlight Starter Kit: Basics
+# TradeX Chart Documentation
+
+This directory contains the documentation website for TradeX Chart, built with [Astro](https://astro.build) and [Starlight](https://starlight.astro.build/).
+
+## 📁 Project Structure
 
 ```
-npm create astro@latest -- --template starlight
-```
-
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/withastro/starlight/tree/main/examples/basics)
-[![Open with CodeSandbox](https://assets.codesandbox.io/github/button-edit-lime.svg)](https://codesandbox.io/p/sandbox/github/withastro/starlight/tree/main/examples/basics)
-
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro + Starlight project, you'll see the following folders and files:
-
-```
-.
-├── public/
+src/docs/
+├── public/              # Static assets (chart library, data files)
 ├── src/
-│   ├── assets/
+│   ├── assets/         # Images (architecture diagrams, screenshots)
 │   ├── content/
-│   │   ├── docs/
-│   │   └── config.ts
-│   └── env.d.ts
-├── astro.config.mjs
+│   │   ├── docs/       # Documentation content
+│   │   │   ├── guides/      # How-to guides
+│   │   │   ├── reference/   # Reference documentation
+│   │   │   ├── api/         # API documentation
+│   │   │   ├── examples/    # Code examples
+│   │   │   └── index.mdx    # Homepage
+│   │   └── config.ts   # Content collections config
+│   └── styles/         # Custom CSS
+├── astro.config.mjs    # Astro configuration
 ├── package.json
 └── tsconfig.json
 ```
 
-Starlight looks for `.md` or `.mdx` files in the `src/content/docs/` directory. Each file is exposed as a route based on its file name.
-
-Images can be added to `src/assets/` and embedded in Markdown with a relative link.
-
-Static assets, like favicons, can be placed in the `public/` directory.
+Documentation is written in Markdown (`.md`) or MDX (`.mdx`) files in the `src/content/docs/` directory.
 
 ## 🧞 Commands
 
-All commands are run from the root of the project, from a terminal:
+All commands are run from the `src/docs` directory:
 
 | Command                   | Action                                           |
 | :------------------------ | :----------------------------------------------- |
 | `npm install`             | Installs dependencies                            |
-| `npm run dev`             | Starts local dev server at `localhost:3000`      |
-| `npm run build`           | Build your production site to `./dist/`          |
+| `npm run dev`             | Starts local dev server at `localhost:3002`      |
+| `npm run build`           | Build production site to `./dist/`               |
+| `npm run build:github`    | Build with GitHub Pages config                   |
 | `npm run preview`         | Preview your build locally, before deploying     |
 | `npm run astro ...`       | Run CLI commands like `astro add`, `astro check` |
 | `npm run astro -- --help` | Get help using the Astro CLI                     |
 
-## 👀 Want to learn more?
+## 📝 Contributing to Documentation
 
-Check out [Starlight’s docs](https://starlight.astro.build/), read [the Astro documentation](https://docs.astro.build), or jump into the [Astro Discord server](https://astro.build/chat).
+To contribute to the documentation:
+
+1. Edit or add `.md` or `.mdx` files in `src/content/docs/`
+2. Add images to `src/assets/`
+3. Test locally with `npm run dev`
+4. Build with `npm run build` to verify
+
+## 🔗 Resources
+
+- [TradeX Chart Repository](https://github.com/tradex-app/TradeX-chart)
+- [Starlight Documentation](https://starlight.astro.build/)
+- [Astro Documentation](https://docs.astro.build)

@@ -1,0 +1,393 @@
+---
+title: Custom Drawing Tools
+description: Create custom drawing tools for technical analysis
+---
+
+# Custom Drawing Tools
+
+Create custom drawing tools like trendlines, rectangles, and Fibonacci retracements.
+
+## Basic Drawing Tool
+
+```javascript
+class CustomLine {
+  constructor(chart) {
+    this.chart = chart
+    this.points = []
+    this.isDrawing = false
+  }
+
+  start() {
+    this.isDrawing = true
+    this.points = []
+    
+    this.chart.on('click', this.onClick.bind(this))
+    this.chart.on('mousemove', this.onMouseMove.bind(this))
+  }
+
+  onClick(event) {
+    this.points.push({
+      timestamp: event.timestamp,
+      price: event.price
+    })
+
+    if (this.points.length === 2) {
+      this.finish()
+    }
+  }
+
+  onMouseMove(event) {
+    if (this.points.length === 1) {
+      this.drawPreview(this.points[0], {
+        timestamp: event.timestamp,
+        price: event.price
+      })
+    }
+  }
+
+  drawPreview(start, end) {
+    // Draw temporary line
+    this.chart.drawLine(start, end, {
+      color: '#888',
+      width: 1,
+      style: 'dashed'
+    })
+  }
+
+  finish() {
+    this.isDrawing = false
+    this.chart.off('click', this.onClick)
+    this.chart.off('mousemove', this.onMouseMove)
+    
+    // Draw final line
+    this.chart.addDrawing('line', {
+      points: this.points,
+      color: '#2196F3',
+      width: 2
+    })
+  }
+}
+
+// Usage
+const lineTool = new CustomLine(chart)
+lineTool.start()
+```
+
+## Fibonacci Retracement
+
+```javascript
+class FibonacciRetracement {
+  constructor(chart) {
+    this.chart = chart
+    this.levels = [0, 0.236, 0.382, 0.5, 0.618, 0.786, 1]
+    this.colors = {
+      0: '#808080',
+      0.236: '#FF6B6B',
+      0.382: '#4ECDC4',
+      0.5: '#45B7D1',
+      0.618: '#FFA07A',
+      0.786: '#98D8C8',
+      1: '#808080'
+    }
+  }
+
+  draw(start, end) {
+    const priceDiff = end.price - start.price
+    const timeDiff = end.timestamp - start.timestamp
+
+    this.levels.forEach(level => {
+      const price = start.price + (priceDiff * level)
+      
+      // Draw horizontal line
+      this.chart.addDrawing('line', {
+        points: [
+          { timestamp: start.timestamp, price },
+          { timestamp: end.timestamp, price }
+        ],
+        color: this.colors[level],
+        width: 1,
+        style: level === 0 || level === 1 ? 'solid' : 'dashed'
+      })
+
+      // Add label
+      this.chart.addText({
+        timestamp: end.timestamp,
+        price,
+        text: `${(level * 100).toFixed(1)}% (${price.toFixed(2)})`,
+        color: this.colors[level]
+      })
+    })
+  }
+}
+
+// Usage
+const fib = new FibonacciRetracement(chart)
+fib.draw(
+  { timestamp: 1609459200000, price: 29000 },
+  { timestamp: 1609545600000, price: 35000 }
+)
+```
+
+## Rectangle Tool
+
+```javascript
+class RectangleTool {
+  constructor(chart, options = {}) {
+    this.chart = chart
+    this.options = {
+      fillColor: 'rgba(33, 150, 243, 0.1)',
+      borderColor: '#2196F3',
+      borderWidth: 2,
+      ...options
+    }
+  }
+
+  draw(topLeft, bottomRight) {
+    const id = this.chart.addDrawing('rectangle', {
+      points: [topLeft, bottomRight],
+      fill: this.options.fillColor,
+      stroke: this.options.borderColor,
+      strokeWidth: this.options.borderWidth
+    })
+
+    return id
+  }
+
+  drawInteractive() {
+    let firstPoint = null
+
+    const onClick = (event) => {
+      if (!firstPoint) {
+        firstPoint = {
+          timestamp: event.timestamp,
+          price: event.price
+        }
+      } else {
+        this.draw(firstPoint, {
+          timestamp: event.timestamp,
+          price: event.price
+        })
+        
+        firstPoint = null
+        this.chart.off('click', onClick)
+        this.chart.off('mousemove', onMouseMove)
+      }
+    }
+
+    const onMouseMove = (event) => {
+      if (firstPoint) {
+        this.chart.clearPreview()
+        this.chart.drawPreview('rectangle', {
+          points: [firstPoint, {
+            timestamp: event.timestamp,
+            price: event.price
+          }],
+          fill: this.options.fillColor,
+          stroke: this.options.borderColor
+        })
+      }
+    }
+
+    this.chart.on('click', onClick)
+    this.chart.on('mousemove', onMouseMove)
+  }
+}
+
+// Usage
+const rectTool = new RectangleTool(chart)
+rectTool.drawInteractive()
+```
+
+## Complete Drawing Manager
+
+```javascript
+class DrawingManager {
+  constructor(chart) {
+    this.chart = chart
+    this.drawings = new Map()
+    this.activeTool = null
+    this.currentDrawing = null
+  }
+
+  setTool(toolName) {
+    this.deactivateTool()
+    this.activeTool = toolName
+    this.activateTool()
+  }
+
+  activateTool() {
+    switch (this.activeTool) {
+      case 'line':
+        this.startLineTool()
+        break
+      case 'rectangle':
+        this.startRectangleTool()
+        break
+      case 'fibonacci':
+        this.startFibonacciTool()
+        break
+      case 'text':
+        this.startTextTool()
+        break
+    }
+  }
+
+  deactivateTool() {
+    this.chart.off('click')
+    this.chart.off('mousemove')
+    this.chart.clearPreview()
+    this.currentDrawing = null
+  }
+
+  startLineTool() {
+    let points = []
+
+    this.chart.on('click', (event) => {
+      points.push({ timestamp: event.timestamp, price: event.price })
+
+      if (points.length === 2) {
+        const id = this.addDrawing('line', { points })
+        this.deactivateTool()
+      }
+    })
+
+    this.chart.on('mousemove', (event) => {
+      if (points.length === 1) {
+        this.chart.drawPreview('line', {
+          points: [points[0], { timestamp: event.timestamp, price: event.price }]
+        })
+      }
+    })
+  }
+
+  startRectangleTool() {
+    let firstPoint = null
+
+    this.chart.on('click', (event) => {
+      if (!firstPoint) {
+        firstPoint = { timestamp: event.timestamp, price: event.price }
+      } else {
+        const id = this.addDrawing('rectangle', {
+          points: [firstPoint, { timestamp: event.timestamp, price: event.price }]
+        })
+        this.deactivateTool()
+      }
+    })
+
+    this.chart.on('mousemove', (event) => {
+      if (firstPoint) {
+        this.chart.drawPreview('rectangle', {
+          points: [firstPoint, { timestamp: event.timestamp, price: event.price }]
+        })
+      }
+    })
+  }
+
+  addDrawing(type, config) {
+    const id = `drawing_${Date.now()}_${Math.random()}`
+    this.drawings.set(id, { type, config })
+    this.chart.addDrawing(type, { ...config, id })
+    return id
+  }
+
+  removeDrawing(id) {
+    this.chart.removeDrawing(id)
+    this.drawings.delete(id)
+  }
+
+  clearAll() {
+    this.drawings.forEach((_, id) => {
+      this.chart.removeDrawing(id)
+    })
+    this.drawings.clear()
+  }
+
+  exportDrawings() {
+    return Array.from(this.drawings.entries()).map(([id, drawing]) => ({
+      id,
+      ...drawing
+    }))
+  }
+
+  importDrawings(drawings) {
+    drawings.forEach(({ id, type, config }) => {
+      this.drawings.set(id, { type, config })
+      this.chart.addDrawing(type, { ...config, id })
+    })
+  }
+}
+
+// Usage
+const drawingManager = new DrawingManager(chart)
+
+// Activate line tool
+drawingManager.setTool('line')
+
+// Clear all drawings
+drawingManager.clearAll()
+
+// Export/Import
+const exported = drawingManager.exportDrawings()
+localStorage.setItem('drawings', JSON.stringify(exported))
+
+const imported = JSON.parse(localStorage.getItem('drawings'))
+drawingManager.importDrawings(imported)
+```
+
+## UI Integration
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .toolbar {
+      padding: 10px;
+      background: #f5f5f5;
+      border-bottom: 1px solid #ddd;
+    }
+    .tool-button {
+      padding: 8px 16px;
+      margin: 0 5px;
+      border: 1px solid #ccc;
+      background: white;
+      cursor: pointer;
+    }
+    .tool-button.active {
+      background: #2196F3;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button class="tool-button" data-tool="line">Line</button>
+    <button class="tool-button" data-tool="rectangle">Rectangle</button>
+    <button class="tool-button" data-tool="fibonacci">Fibonacci</button>
+    <button class="tool-button" data-tool="text">Text</button>
+    <button class="tool-button" onclick="drawingManager.clearAll()">Clear All</button>
+  </div>
+  
+  <tradex-chart id="chart"></tradex-chart>
+
+  <script>
+    const chart = document.getElementById('chart')
+    const drawingManager = new DrawingManager(chart)
+
+    document.querySelectorAll('.tool-button[data-tool]').forEach(button => {
+      button.addEventListener('click', () => {
+        document.querySelectorAll('.tool-button').forEach(b => b.classList.remove('active'))
+        button.classList.add('active')
+        drawingManager.setTool(button.dataset.tool)
+      })
+    })
+  </script>
+</body>
+</html>
+```
+
+## Related Documentation
+
+- [API Reference](../api/custom-drawing-tools) - Drawing API
+- [Events](../reference/events) - Mouse events
+- [Examples](../examples) - More examples

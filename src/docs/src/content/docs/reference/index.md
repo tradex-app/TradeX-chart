@@ -5,7 +5,7 @@ title: Introduction
 
 TradeX Chart is a highly customizable lightweight financial chart.
 
-It is open source custom HTML component built in plain JavaScript with no frame work dependencies.
+It is an open source custom HTML component built in plain JavaScript with no framework dependencies.
 
 :::caution
 TradeX Chart is currently in heavy development, with the API not yet finalized. However, it is already suitable for displaying candlestick / time-series data.
@@ -32,31 +32,31 @@ TradeX Chart is available via:
 * [JSDelivr](https://cdn.jsdelivr.net/npm/tradex-chart/dist/tradex-chart.umd.min.js)
 * [unPkg](https://unpkg.com/tradex-chart/dist/tradex-chart.umd.js)
 
-# Examples
+## Examples
 
-A number of live editable [CodeSandbox.io examples](../../examples/01_static_chart) in the documentation.
+A number of live editable [CodeSandbox.io examples](../../examples/01_static_chart) are available in the documentation.
 
 ## Versioning
 
-TradeXChart follows [breaking].[feature].[fix] [Semantic Versioning](https://semver.org/)
+TradeX Chart follows [breaking].[feature].[fix] [Semantic Versioning](https://semver.org/)
 
-eg. 0.100.6
+Current version: **0.158.6**
 
-## Bugs Issues Feature Requests
+## Bugs, Issues, and Feature Requests
 
-Testing, [bug reports and feature requests](https://github.com/tradex-app/TradeX-chart/issues) welcome
+Testing, [bug reports, and feature requests](https://github.com/tradex-app/TradeX-chart/issues) are welcome!
 
-If anybody you have any bugs/issues/feature requests, please, before making a submission, first:
+If you have any bugs/issues/feature requests, please, before making a submission, first check:
 * check the GitHub issue tracker: https://github.com/tradex-app/TradeX-chart/issues
 * documentation: https://tradex-app.github.io/TradeX-chart/
 * live examples: https://tradex-chart.guildmedia.net/examples/static_chart/
 * development roadmap: https://tradex-app.github.io/TradeX-chart/TradeX-chart-Development-Roadmap.pdf
 
-To submit an issue:
-* [Fork the chart repostitory](https://github.com/tradex-app/TradeX-chart/fork)
-* Create your Feature Branch ``git checkout -b feature/AmazingFeature``
-* Commit your Changes ``git commit -m 'Add some AmazingFeature'``
-* Push to the Branch ``git push origin feature/AmazingFeature``
+To contribute:
+* [Fork the chart repository](https://github.com/tradex-app/TradeX-chart/fork)
+* Create your Feature Branch: `git checkout -b feature/AmazingFeature`
+* Commit your Changes: `git commit -m 'Add some AmazingFeature'`
+* Push to the Branch: `git push origin feature/AmazingFeature`
 * Open a [Pull Request](https://github.com/tradex-app/TradeX-chart/pulls)
 
 You can help speed up development by contributing with crypto or PayPal.

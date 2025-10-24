@@ -1,0 +1,465 @@
+---
+title: Real-Time WebSocket
+description: Integrate real-time data feeds via WebSocket
+---
+
+# Real-Time WebSocket Integration
+
+Connect TradeX Chart to live data feeds using WebSocket for real-time updates.
+
+## Basic WebSocket Connection
+
+```javascript
+class RealtimeChart {
+  constructor(chart, symbol) {
+    this.chart = chart
+    this.symbol = symbol
+    this.ws = null
+    this.reconnectAttempts = 0
+    this.maxReconnectAttempts = 5
+  }
+
+  connect() {
+    this.ws = new WebSocket('wss://api.example.com/ws')
+
+    this.ws.onopen = () => {
+      console.log('WebSocket connected')
+      this.reconnectAttempts = 0
+      this.subscribe()
+    }
+
+    this.ws.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      this.handleMessage(data)
+    }
+
+    this.ws.onerror = (error) => {
+      console.error('WebSocket error:', error)
+    }
+
+    this.ws.onclose = () => {
+      console.log('WebSocket closed')
+      this.reconnect()
+    }
+  }
+
+  subscribe() {
+    this.ws.send(JSON.stringify({
+      type: 'subscribe',
+      symbol: this.symbol,
+      channel: 'candles'
+    }))
+  }
+
+  handleMessage(data) {
+    if (data.type === 'candle') {
+      const candle = [
+        data.timestamp,
+        data.open,
+        data.high,
+        data.low,
+        data.close,
+        data.volume
+      ]
+
+      if (data.isClosed) {
+        this.chart.addCandle(candle)
+      } else {
+        this.chart.updateStreamingCandle(candle)
+      }
+    }
+  }
+
+  reconnect() {
+    if (this.reconnectAttempts < this.maxReconnectAttempts) {
+      this.reconnectAttempts++
+      const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000)
+      
+      console.log(`Reconnecting in ${delay}ms...`)
+      setTimeout(() => this.connect(), delay)
+    } else {
+      console.error('Max reconnection attempts reached')
+    }
+  }
+
+  disconnect() {
+    if (this.ws) {
+      this.ws.close()
+      this.ws = null
+    }
+  }
+}
+
+// Usage
+const chart = document.getElementById('chart')
+const realtimeChart = new RealtimeChart(chart, 'BTCUSDT')
+realtimeChart.connect()
+```
+
+## Binance WebSocket Integration
+
+```javascript
+class BinanceRealtimeChart {
+  constructor(chart, symbol, interval = '1m') {
+    this.chart = chart
+    this.symbol = symbol.toLowerCase()
+    this.interval = interval
+    this.ws = null
+  }
+
+  connect() {
+    const wsUrl = `wss://stream.binance.com:9443/ws/${this.symbol}@kline_${this.interval}`
+    this.ws = new WebSocket(wsUrl)
+
+    this.ws.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      
+      if (data.e === 'kline') {
+        const k = data.k
+        const candle = [
+          k.t,                    // timestamp
+          parseFloat(k.o),        // open
+          parseFloat(k.h),        // high
+          parseFloat(k.l),        // low
+          parseFloat(k.c),        // close
+          parseFloat(k.v)         // volume
+        ]
+
+        if (k.x) {
+          // Candle is closed
+          this.chart.addCandle(candle)
+        } else {
+          // Candle is still forming
+          this.chart.updateStreamingCandle(candle)
+        }
+      }
+    }
+
+    this.ws.onerror = (error) => {
+      console.error('Binance WebSocket error:', error)
+    }
+
+    this.ws.onclose = () => {
+      console.log('Binance WebSocket closed')
+      setTimeout(() => this.connect(), 3000)
+    }
+  }
+
+  disconnect() {
+    if (this.ws) {
+      this.ws.close()
+    }
+  }
+}
+
+// Usage
+const chart = document.getElementById('chart')
+const binanceChart = new BinanceRealtimeChart(chart, 'BTCUSDT', '1m')
+binanceChart.connect()
+```
+
+## Multi-Symbol WebSocket
+
+```javascript
+class MultiSymbolWebSocket {
+  constructor() {
+    this.ws = null
+    this.subscriptions = new Map()
+    this.callbacks = new Map()
+  }
+
+  connect() {
+    this.ws = new WebSocket('wss://api.example.com/ws')
+
+    this.ws.onopen = () => {
+      console.log('Connected')
+      // Resubscribe to all symbols
+      this.subscriptions.forEach((_, symbol) => {
+        this.sendSubscribe(symbol)
+      })
+    }
+
+    this.ws.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      const callbacks = this.callbacks.get(data.symbol)
+      
+      if (callbacks) {
+        callbacks.forEach(callback => callback(data))
+      }
+    }
+
+    this.ws.onclose = () => {
+      console.log('Disconnected')
+      setTimeout(() => this.connect(), 3000)
+    }
+  }
+
+  subscribe(symbol, callback) {
+    if (!this.subscriptions.has(symbol)) {
+      this.subscriptions.set(symbol, true)
+      this.sendSubscribe(symbol)
+    }
+
+    if (!this.callbacks.has(symbol)) {
+      this.callbacks.set(symbol, [])
+    }
+    this.callbacks.get(symbol).push(callback)
+  }
+
+  unsubscribe(symbol, callback) {
+    const callbacks = this.callbacks.get(symbol)
+    if (callbacks) {
+      const index = callbacks.indexOf(callback)
+      if (index > -1) {
+        callbacks.splice(index, 1)
+      }
+
+      if (callbacks.length === 0) {
+        this.callbacks.delete(symbol)
+        this.subscriptions.delete(symbol)
+        this.sendUnsubscribe(symbol)
+      }
+    }
+  }
+
+  sendSubscribe(symbol) {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({
+        type: 'subscribe',
+        symbol: symbol
+      }))
+    }
+  }
+
+  sendUnsubscribe(symbol) {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({
+        type: 'unsubscribe',
+        symbol: symbol
+      }))
+    }
+  }
+}
+
+// Usage
+const wsManager = new MultiSymbolWebSocket()
+wsManager.connect()
+
+// Subscribe multiple charts
+const chart1 = document.getElementById('chart1')
+wsManager.subscribe('BTCUSDT', (data) => {
+  chart1.updateStreamingCandle(data.candle)
+})
+
+const chart2 = document.getElementById('chart2')
+wsManager.subscribe('ETHUSDT', (data) => {
+  chart2.updateStreamingCandle(data.candle)
+})
+```
+
+## Heartbeat & Reconnection
+
+```javascript
+class RobustWebSocket {
+  constructor(url, options = {}) {
+    this.url = url
+    this.options = {
+      heartbeatInterval: 30000,
+      reconnectDelay: 3000,
+      maxReconnectDelay: 30000,
+      reconnectDecay: 1.5,
+      ...options
+    }
+    
+    this.ws = null
+    this.heartbeatTimer = null
+    this.reconnectTimer = null
+    this.reconnectAttempts = 0
+    this.messageHandlers = []
+  }
+
+  connect() {
+    this.ws = new WebSocket(this.url)
+
+    this.ws.onopen = () => {
+      console.log('WebSocket connected')
+      this.reconnectAttempts = 0
+      this.startHeartbeat()
+      this.onOpen?.()
+    }
+
+    this.ws.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      
+      // Handle pong
+      if (data.type === 'pong') {
+        return
+      }
+
+      // Call all message handlers
+      this.messageHandlers.forEach(handler => handler(data))
+    }
+
+    this.ws.onerror = (error) => {
+      console.error('WebSocket error:', error)
+      this.onError?.(error)
+    }
+
+    this.ws.onclose = () => {
+      console.log('WebSocket closed')
+      this.stopHeartbeat()
+      this.scheduleReconnect()
+      this.onClose?.()
+    }
+  }
+
+  startHeartbeat() {
+    this.heartbeatTimer = setInterval(() => {
+      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+        this.ws.send(JSON.stringify({ type: 'ping' }))
+      }
+    }, this.options.heartbeatInterval)
+  }
+
+  stopHeartbeat() {
+    if (this.heartbeatTimer) {
+      clearInterval(this.heartbeatTimer)
+      this.heartbeatTimer = null
+    }
+  }
+
+  scheduleReconnect() {
+    if (this.reconnectTimer) return
+
+    const delay = Math.min(
+      this.options.reconnectDelay * Math.pow(this.options.reconnectDecay, this.reconnectAttempts),
+      this.options.maxReconnectDelay
+    )
+
+    console.log(`Reconnecting in ${delay}ms...`)
+    this.reconnectAttempts++
+
+    this.reconnectTimer = setTimeout(() => {
+      this.reconnectTimer = null
+      this.connect()
+    }, delay)
+  }
+
+  send(data) {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify(data))
+    } else {
+      console.warn('WebSocket not connected')
+    }
+  }
+
+  onMessage(handler) {
+    this.messageHandlers.push(handler)
+  }
+
+  disconnect() {
+    this.stopHeartbeat()
+    if (this.reconnectTimer) {
+      clearTimeout(this.reconnectTimer)
+      this.reconnectTimer = null
+    }
+    if (this.ws) {
+      this.ws.close()
+      this.ws = null
+    }
+  }
+}
+
+// Usage
+const ws = new RobustWebSocket('wss://api.example.com/ws')
+
+ws.onOpen = () => {
+  ws.send({ type: 'subscribe', symbol: 'BTCUSDT' })
+}
+
+ws.onMessage((data) => {
+  if (data.type === 'candle') {
+    chart.updateStreamingCandle(data.candle)
+  }
+})
+
+ws.connect()
+```
+
+## Complete Example with React
+
+```jsx
+import { useEffect, useRef, useState } from 'react'
+
+function RealtimeChart({ symbol, interval }) {
+  const chartRef = useRef(null)
+  const wsRef = useRef(null)
+  const [connected, setConnected] = useState(false)
+  const [lastUpdate, setLastUpdate] = useState(null)
+
+  useEffect(() => {
+    const chart = chartRef.current
+    if (!chart) return
+
+    // Connect WebSocket
+    const wsUrl = `wss://stream.binance.com:9443/ws/${symbol.toLowerCase()}@kline_${interval}`
+    wsRef.current = new WebSocket(wsUrl)
+
+    wsRef.current.onopen = () => {
+      setConnected(true)
+    }
+
+    wsRef.current.onmessage = (event) => {
+      const data = JSON.parse(event.data)
+      
+      if (data.e === 'kline') {
+        const k = data.k
+        const candle = [
+          k.t,
+          parseFloat(k.o),
+          parseFloat(k.h),
+          parseFloat(k.l),
+          parseFloat(k.c),
+          parseFloat(k.v)
+        ]
+
+        if (k.x) {
+          chart.addCandle(candle)
+        } else {
+          chart.updateStreamingCandle(candle)
+        }
+
+        setLastUpdate(new Date())
+      }
+    }
+
+    wsRef.current.onclose = () => {
+      setConnected(false)
+    }
+
+    return () => {
+      if (wsRef.current) {
+        wsRef.current.close()
+      }
+    }
+  }, [symbol, interval])
+
+  return (
+    <div>
+      <div className="status">
+        Status: {connected ? '🟢 Connected' : '🔴 Disconnected'}
+        {lastUpdate && ` | Last update: ${lastUpdate.toLocaleTimeString()}`}
+      </div>
+      <tradex-chart ref={chartRef} />
+    </div>
+  )
+}
+
+export default RealtimeChart
+```
+
+## Related Documentation
+
+- [API Reference](../api/real-time-websocket) - WebSocket API
+- [Data Management](../guides/data-management) - Data handling
+- [Backend Integration](../guides/backend/websocket-integration) - Server setup

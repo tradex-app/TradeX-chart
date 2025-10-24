@@ -1,0 +1,397 @@
+---
+title: Real-Time WebSocket API
+description: API reference for WebSocket integration
+---
+
+# Real-Time WebSocket API
+
+API reference for integrating real-time data feeds via WebSocket.
+
+## Chart Methods
+
+### addCandle()
+
+Add a completed candle to the chart.
+
+```typescript
+chart.addCandle(candle: OHLCV): void
+
+type OHLCV = [
+  timestamp: number,  // Unix timestamp in milliseconds
+  open: number,       // Opening price
+  high: number,       // Highest price
+  low: number,        // Lowest price
+  close: number,      // Closing price
+  volume?: number     // Trading volume (optional)
+]
+```
+
+**Parameters:**
+- `candle`: OHLCV array representing a completed candle
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+const candle = [1609459200000, 29000, 29500, 28800, 29200, 1234.56]
+chart.addCandle(candle)
+```
+
+### updateStreamingCandle()
+
+Update the current forming candle (for real-time updates).
+
+```typescript
+chart.updateStreamingCandle(candle: OHLCV): void
+```
+
+**Parameters:**
+- `candle`: OHLCV array representing the current candle
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data)
+  const candle = [
+    data.timestamp,
+    data.open,
+    data.high,
+    data.low,
+    data.close,
+    data.volume
+  ]
+  
+  if (data.isClosed) {
+    chart.addCandle(candle)
+  } else {
+    chart.updateStreamingCandle(candle)
+  }
+}
+```
+
+### addCandles()
+
+Add multiple candles at once.
+
+```typescript
+chart.addCandles(candles: OHLCV[]): void
+```
+
+**Parameters:**
+- `candles`: Array of OHLCV candles
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+const candles = [
+  [1609459200000, 29000, 29500, 28800, 29200, 1234.56],
+  [1609462800000, 29200, 29800, 29100, 29600, 2345.67]
+]
+chart.addCandles(candles)
+```
+
+### setData()
+
+Replace all chart data.
+
+```typescript
+chart.setData(data: OHLCV[]): void
+```
+
+**Parameters:**
+- `data`: Array of OHLCV candles
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+const historicalData = await fetchHistoricalData()
+chart.setData(historicalData)
+```
+
+### mergeData()
+
+Merge new data with existing data.
+
+```typescript
+chart.mergeData(data: OHLCV[]): void
+```
+
+**Parameters:**
+- `data`: Array of OHLCV candles to merge
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+const newData = await fetchMoreData()
+chart.mergeData(newData)
+```
+
+## WebSocket Connection
+
+### Connection States
+
+```typescript
+enum WebSocketState {
+  CONNECTING = 0,
+  OPEN = 1,
+  CLOSING = 2,
+  CLOSED = 3
+}
+```
+
+### WebSocket Events
+
+```typescript
+interface WebSocketEvents {
+  onopen: (event: Event) => void
+  onmessage: (event: MessageEvent) => void
+  onerror: (event: Event) => void
+  onclose: (event: CloseEvent) => void
+}
+```
+
+**Example:**
+```javascript
+const ws = new WebSocket('wss://api.example.com/ws')
+
+ws.onopen = () => {
+  console.log('WebSocket connected')
+  ws.send(JSON.stringify({ type: 'subscribe', symbol: 'BTCUSDT' }))
+}
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data)
+  handleMessage(data)
+}
+
+ws.onerror = (error) => {
+  console.error('WebSocket error:', error)
+}
+
+ws.onclose = () => {
+  console.log('WebSocket closed')
+  reconnect()
+}
+```
+
+## Message Formats
+
+### Subscribe Message
+
+```typescript
+interface SubscribeMessage {
+  type: 'subscribe'
+  symbol: string
+  channel?: string
+  interval?: string
+}
+```
+
+**Example:**
+```javascript
+ws.send(JSON.stringify({
+  type: 'subscribe',
+  symbol: 'BTCUSDT',
+  channel: 'kline',
+  interval: '1m'
+}))
+```
+
+### Unsubscribe Message
+
+```typescript
+interface UnsubscribeMessage {
+  type: 'unsubscribe'
+  symbol: string
+  channel?: string
+}
+```
+
+**Example:**
+```javascript
+ws.send(JSON.stringify({
+  type: 'unsubscribe',
+  symbol: 'BTCUSDT'
+}))
+```
+
+### Candle Update Message
+
+```typescript
+interface CandleMessage {
+  type: 'candle'
+  symbol: string
+  timestamp: number
+  open: number
+  high: number
+  low: number
+  close: number
+  volume: number
+  isClosed: boolean
+}
+```
+
+**Example:**
+```javascript
+ws.onmessage = (event) => {
+  const msg: CandleMessage = JSON.parse(event.data)
+  
+  if (msg.type === 'candle') {
+    const candle = [
+      msg.timestamp,
+      msg.open,
+      msg.high,
+      msg.low,
+      msg.close,
+      msg.volume
+    ]
+    
+    if (msg.isClosed) {
+      chart.addCandle(candle)
+    } else {
+      chart.updateStreamingCandle(candle)
+    }
+  }
+}
+```
+
+## Reconnection
+
+### Exponential Backoff
+
+```typescript
+interface ReconnectOptions {
+  maxAttempts?: number
+  initialDelay?: number
+  maxDelay?: number
+  factor?: number
+}
+
+function reconnect(options: ReconnectOptions): void
+```
+
+**Parameters:**
+- `maxAttempts`: Maximum reconnection attempts (default: 5)
+- `initialDelay`: Initial delay in ms (default: 1000)
+- `maxDelay`: Maximum delay in ms (default: 30000)
+- `factor`: Backoff multiplier (default: 2)
+
+**Example:**
+```javascript
+let reconnectAttempts = 0
+const maxAttempts = 5
+
+function reconnect() {
+  if (reconnectAttempts >= maxAttempts) {
+    console.error('Max reconnection attempts reached')
+    return
+  }
+  
+  const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000)
+  reconnectAttempts++
+  
+  setTimeout(() => {
+    console.log(`Reconnecting... (attempt ${reconnectAttempts})`)
+    connect()
+  }, delay)
+}
+```
+
+## Heartbeat
+
+### Ping/Pong
+
+```typescript
+interface HeartbeatOptions {
+  interval?: number  // Interval in ms (default: 30000)
+  timeout?: number   // Timeout in ms (default: 5000)
+}
+
+function startHeartbeat(ws: WebSocket, options: HeartbeatOptions): void
+```
+
+**Example:**
+```javascript
+let heartbeatTimer
+let heartbeatTimeout
+
+function startHeartbeat() {
+  heartbeatTimer = setInterval(() => {
+    if (ws.readyState === WebSocket.OPEN) {
+      ws.send(JSON.stringify({ type: 'ping' }))
+      
+      heartbeatTimeout = setTimeout(() => {
+        console.error('Heartbeat timeout')
+        ws.close()
+      }, 5000)
+    }
+  }, 30000)
+}
+
+ws.onmessage = (event) => {
+  const data = JSON.parse(event.data)
+  
+  if (data.type === 'pong') {
+    clearTimeout(heartbeatTimeout)
+  }
+}
+```
+
+## TypeScript Definitions
+
+```typescript
+declare module 'tradex-chart' {
+  export type OHLCV = [
+    timestamp: number,
+    open: number,
+    high: number,
+    low: number,
+    close: number,
+    volume?: number
+  ]
+
+  export interface TradeXChart {
+    addCandle(candle: OHLCV): void
+    updateStreamingCandle(candle: OHLCV): void
+    addCandles(candles: OHLCV[]): void
+    setData(data: OHLCV[]): void
+    mergeData(data: OHLCV[]): void
+  }
+
+  export interface CandleMessage {
+    type: 'candle'
+    symbol: string
+    timestamp: number
+    open: number
+    high: number
+    low: number
+    close: number
+    volume: number
+    isClosed: boolean
+  }
+
+  export interface SubscribeMessage {
+    type: 'subscribe'
+    symbol: string
+    channel?: string
+    interval?: string
+  }
+
+  export interface UnsubscribeMessage {
+    type: 'unsubscribe'
+    symbol: string
+    channel?: string
+  }
+}
+```
+
+## Related Documentation
+
+- [Example](../examples/real-time-websocket) - WebSocket example
+- [Data Management](../guides/data-management) - Data handling
+- [Backend Integration](../guides/backend/websocket-integration) - Server setup

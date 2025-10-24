@@ -26,11 +26,13 @@ title: Architecture
                   * Technical Indicators
                   * User Defined
 
-Most of these features can be accessed externally eg.
+Most of these features can be accessed externally, e.g.:
 
-``chart.secondaryPane.entries().next().value[1]``
+```javascript
+chart.secondaryPane.entries().next().value[1]
+```
 
-Although it is recommended that use the API to modify the chart or respond to events.
+Although it is recommended that you use the API to modify the chart or respond to events.
 
 ## Factory
 
@@ -53,48 +55,45 @@ The core starts the cascade of chart component creation. It provides:
 
 # Patterns
 
-**Hook Observer Pattern**
-An extensible API like WordPress
-making it easy for third party programmers to write extensions to the core
+**Hook Observer Pattern**  
+An extensible API like WordPress, making it easy for third-party programmers to write extensions to the core.
 
-**Aspect-Oriented Programming**
-Code injection
-into existing functions or objects, without modifying the target logic.
+**Aspect-Oriented Programming**  
+Code injection into existing functions or objects, without modifying the target logic.
 
-**State Machine**
-Logical state management
-providing a behaviour model describing the states the system can be in and the conditions by which one transitions to another.
+**State Machine**  
+Logical state management providing a behavior model describing the states the system can be in and the conditions by which one transitions to another.
 
-**Global Store**
+**Global Store**  
+Centralized data management.
 
-**Event Hub**
+**Event Hub**  
+Centralized event messaging system.
 
-**Scalable Application Architecture**
-Decoupled, event-driven architecture
+**Scalable Application Architecture**  
+Decoupled, event-driven architecture.
 
-**Model Contoler View**
+**Model Controller View**  
+Separation of concerns pattern.
 
 ## Aspect-Oriented Programming
 
-Code injection
+Code injection into existing functions or objects without modifying the target logic.
 
-[https://en.wikipedia.org/wiki/Aspect-oriented_programming](https://en.wikipedia.org/wiki/Aspect-oriented_programming)
-
-### Meld
-
-[https://github.com/cujojs/meld](https://github.com/cujojs/meld)
+- [Wikipedia: Aspect-oriented programming](https://en.wikipedia.org/wiki/Aspect-oriented_programming)
+- [Meld library](https://github.com/cujojs/meld)
 
 ## State Machine
 
-Logical finite state management
+Logical finite state management.
 
 ![State Machine](../../../assets/quick_ref_sct_overview.png)
 
-[State Machine documentation](state_machine.md)
+[State Machine documentation](state_machine)
 
-## Scalable Javascript Applicaton Architecture
+## Scalable JavaScript Application Architecture
 
-decoupled, event-driven architecture
+Decoupled, event-driven architecture.
 
 The features of the architecture are decoupled, allowing for flexible and extensible applications. The application is broken down into the following parts:
 

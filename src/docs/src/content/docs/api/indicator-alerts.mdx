@@ -1,0 +1,329 @@
+---
+title: Indicator Alerts API
+description: API reference for indicator-based alerts
+---
+
+# Indicator Alerts API
+
+API reference for creating alerts based on indicator conditions.
+
+## AlertManager
+
+### Constructor
+
+```typescript
+class AlertManager {
+  constructor(chart: TradeXChart)
+}
+```
+
+**Parameters:**
+- `chart`: TradeX chart instance
+
+**Example:**
+```javascript
+const alertManager = new AlertManager(chart)
+```
+
+### Methods
+
+#### addAlert()
+
+Add a new alert.
+
+```typescript
+addAlert(config: AlertConfig): string
+
+interface AlertConfig {
+  type: 'indicator' | 'price'
+  indicator?: string
+  condition: 'above' | 'below' | 'crosses_above' | 'crosses_below'
+  value: number
+  message: string
+  sound?: string
+  onTrigger?: (alert: Alert) => void
+}
+```
+
+**Parameters:**
+- `config`: Alert configuration
+
+**Returns:** Alert ID (string)
+
+**Example:**
+```javascript
+const id = alertManager.addAlert({
+  type: 'indicator',
+  indicator: 'RSI',
+  condition: 'above',
+  value: 70,
+  message: 'RSI is overbought!',
+  sound: '/alert.mp3',
+  onTrigger: (alert) => {
+    console.log('Alert triggered:', alert)
+  }
+})
+```
+
+#### removeAlert()
+
+Remove an alert.
+
+```typescript
+removeAlert(id: string): void
+```
+
+**Parameters:**
+- `id`: Alert identifier
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+alertManager.removeAlert('alert_123')
+```
+
+#### getAlert()
+
+Get alert by ID.
+
+```typescript
+getAlert(id: string): Alert | null
+
+interface Alert {
+  id: string
+  config: AlertConfig
+  triggered: boolean
+}
+```
+
+**Parameters:**
+- `id`: Alert identifier
+
+**Returns:** Alert object or null
+
+**Example:**
+```javascript
+const alert = alertManager.getAlert('alert_123')
+```
+
+#### getAlerts()
+
+Get all alerts.
+
+```typescript
+getAlerts(): Alert[]
+```
+
+**Returns:** Array of alerts
+
+**Example:**
+```javascript
+const alerts = alertManager.getAlerts()
+console.log(`Total alerts: ${alerts.length}`)
+```
+
+#### clearAll()
+
+Remove all alerts.
+
+```typescript
+clearAll(): void
+```
+
+**Returns:** `void`
+
+**Example:**
+```javascript
+alertManager.clearAll()
+```
+
+## Alert Types
+
+### Indicator Alert
+
+```typescript
+interface IndicatorAlertConfig extends AlertConfig {
+  type: 'indicator'
+  indicator: 'RSI' | 'MACD' | 'SMA' | 'EMA' | string
+  condition: 'above' | 'below' | 'crosses_above' | 'crosses_below'
+  value: number
+}
+```
+
+**Example:**
+```javascript
+alertManager.addAlert({
+  type: 'indicator',
+  indicator: 'RSI',
+  condition: 'above',
+  value: 70,
+  message: 'RSI overbought'
+})
+```
+
+### Price Alert
+
+```typescript
+interface PriceAlertConfig extends AlertConfig {
+  type: 'price'
+  condition: 'above' | 'below'
+  value: number
+}
+```
+
+**Example:**
+```javascript
+alertManager.addAlert({
+  type: 'price',
+  condition: 'above',
+  value: 50000,
+  message: 'Price above $50,000'
+})
+```
+
+## Notification API
+
+### Browser Notifications
+
+```typescript
+interface NotificationOptions {
+  title: string
+  body: string
+  icon?: string
+  tag?: string
+}
+
+function showNotification(options: NotificationOptions): void
+```
+
+**Example:**
+```javascript
+if ('Notification' in window && Notification.permission === 'granted') {
+  new Notification('Chart Alert', {
+    body: 'RSI is overbought at 75',
+    icon: '/chart-icon.png'
+  })
+}
+```
+
+### Request Permission
+
+```typescript
+async function requestNotificationPermission(): Promise<NotificationPermission>
+```
+
+**Returns:** Permission status ('granted', 'denied', or 'default')
+
+**Example:**
+```javascript
+const permission = await Notification.requestPermission()
+if (permission === 'granted') {
+  console.log('Notifications enabled')
+}
+```
+
+## Sound Alerts
+
+### Play Sound
+
+```typescript
+function playSound(url: string): Promise<void>
+```
+
+**Parameters:**
+- `url`: Sound file URL
+
+**Returns:** Promise
+
+**Example:**
+```javascript
+const audio = new Audio('/alert.mp3')
+audio.play().catch(error => {
+  console.error('Failed to play sound:', error)
+})
+```
+
+## Events
+
+### alertTriggered
+
+```typescript
+alertManager.on('alertTriggered', (event: AlertEvent) => void)
+
+interface AlertEvent {
+  alert: Alert
+  value: number
+}
+```
+
+**Example:**
+```javascript
+alertManager.on('alertTriggered', (event) => {
+  console.log('Alert triggered:', event.alert.config.message)
+})
+```
+
+### alertAdded
+
+```typescript
+alertManager.on('alertAdded', (event: { alert: Alert }) => void)
+```
+
+**Example:**
+```javascript
+alertManager.on('alertAdded', (event) => {
+  console.log('Alert added:', event.alert.id)
+})
+```
+
+### alertRemoved
+
+```typescript
+alertManager.on('alertRemoved', (event: { id: string }) => void)
+```
+
+**Example:**
+```javascript
+alertManager.on('alertRemoved', (event) => {
+  console.log('Alert removed:', event.id)
+})
+```
+
+## TypeScript Definitions
+
+```typescript
+declare module 'tradex-chart' {
+  export class AlertManager {
+    constructor(chart: TradeXChart)
+    addAlert(config: AlertConfig): string
+    removeAlert(id: string): void
+    getAlert(id: string): Alert | null
+    getAlerts(): Alert[]
+    clearAll(): void
+    on(event: string, callback: Function): void
+  }
+
+  export interface AlertConfig {
+    type: 'indicator' | 'price'
+    indicator?: string
+    condition: 'above' | 'below' | 'crosses_above' | 'crosses_below'
+    value: number
+    message: string
+    sound?: string
+    onTrigger?: (alert: Alert) => void
+  }
+
+  export interface Alert {
+    id: string
+    config: AlertConfig
+    triggered: boolean
+  }
+}
+```
+
+## Related Documentation
+
+- [Example](../examples/indicator-alerts) - Alerts example
+- [Indicators](../guides/indicators) - Indicator guide
+- [Events](../reference/events) - Event reference

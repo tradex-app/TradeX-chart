@@ -206,6 +206,55 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".md"] };
+"api/custom-drawing-tools.mdx": {
+	id: "api/custom-drawing-tools.mdx";
+  slug: "api/custom-drawing-tools";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"api/custom-theme-builder.mdx": {
+	id: "api/custom-theme-builder.mdx";
+  slug: "api/custom-theme-builder";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"api/export-chart-image.mdx": {
+	id: "api/export-chart-image.mdx";
+  slug: "api/export-chart-image";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"api/indicator-alerts.mdx": {
+	id: "api/indicator-alerts.mdx";
+  slug: "api/indicator-alerts";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"api/mobile-responsive.mdx": {
+	id: "api/mobile-responsive.mdx";
+  slug: "api/mobile-responsive";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"api/multi-chart-sync.mdx": {
+	id: "api/multi-chart-sync.mdx";
+  slug: "api/multi-chart-sync";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"api/real-time-websocket.mdx": {
+	id: "api/real-time-websocket.mdx";
+  slug: "api/real-time-websocket";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
 "documentation.mdx": {
 	id: "documentation.mdx";
   slug: "documentation";
@@ -227,9 +276,30 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
+"examples/custom-drawing-tools.mdx": {
+	id: "examples/custom-drawing-tools.mdx";
+  slug: "examples/custom-drawing-tools";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"examples/custom-theme-builder.mdx": {
+	id: "examples/custom-theme-builder.mdx";
+  slug: "examples/custom-theme-builder";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
 "examples/custom_indicator.mdx": {
 	id: "examples/custom_indicator.mdx";
   slug: "examples/custom_indicator";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"examples/export-chart-image.mdx": {
+	id: "examples/export-chart-image.mdx";
+  slug: "examples/export-chart-image";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
@@ -241,6 +311,34 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
+"examples/indicator-alerts.mdx": {
+	id: "examples/indicator-alerts.mdx";
+  slug: "examples/indicator-alerts";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"examples/mobile-responsive.mdx": {
+	id: "examples/mobile-responsive.mdx";
+  slug: "examples/mobile-responsive";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"examples/multi-chart-sync.mdx": {
+	id: "examples/multi-chart-sync.mdx";
+  slug: "examples/multi-chart-sync";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
+"examples/real-time-websocket.mdx": {
+	id: "examples/real-time-websocket.mdx";
+  slug: "examples/real-time-websocket";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".mdx"] };
 "examples/static_chart.mdx": {
 	id: "examples/static_chart.mdx";
   slug: "examples/static_chart";
@@ -248,6 +346,55 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
+"guides/accessibility.md": {
+	id: "guides/accessibility.md";
+  slug: "guides/accessibility";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/backend/data-caching-strategies.md": {
+	id: "guides/backend/data-caching-strategies.md";
+  slug: "guides/backend/data-caching-strategies";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/backend/graphql-integration.md": {
+	id: "guides/backend/graphql-integration.md";
+  slug: "guides/backend/graphql-integration";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/backend/rest-api-integration.md": {
+	id: "guides/backend/rest-api-integration.md";
+  slug: "guides/backend/rest-api-integration";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/backend/websocket-integration.md": {
+	id: "guides/backend/websocket-integration.md";
+  slug: "guides/backend/websocket-integration";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/comparison.md": {
+	id: "guides/comparison.md";
+  slug: "guides/comparison";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/contributing.md": {
+	id: "guides/contributing.md";
+  slug: "guides/contributing";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
 "guides/custom_indicator.mdx": {
 	id: "guides/custom_indicator.mdx";
   slug: "guides/custom_indicator";
@@ -255,6 +402,118 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".mdx"] };
+"guides/data-management.md": {
+	id: "guides/data-management.md";
+  slug: "guides/data-management";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/deployment/cdn-deployment.md": {
+	id: "guides/deployment/cdn-deployment.md";
+  slug: "guides/deployment/cdn-deployment";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/deployment/production-checklist.md": {
+	id: "guides/deployment/production-checklist.md";
+  slug: "guides/deployment/production-checklist";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/deployment/security-considerations.md": {
+	id: "guides/deployment/security-considerations.md";
+  slug: "guides/deployment/security-considerations";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/deployment/vite-config.md": {
+	id: "guides/deployment/vite-config.md";
+  slug: "guides/deployment/vite-config";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/deployment/webpack-config.md": {
+	id: "guides/deployment/webpack-config.md";
+  slug: "guides/deployment/webpack-config";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/development/build-process.md": {
+	id: "guides/development/build-process.md";
+  slug: "guides/development/build-process";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/development/contributing-code.md": {
+	id: "guides/development/contributing-code.md";
+  slug: "guides/development/contributing-code";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/development/debugging-tips.md": {
+	id: "guides/development/debugging-tips.md";
+  slug: "guides/development/debugging-tips";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/development/local-setup.md": {
+	id: "guides/development/local-setup.md";
+  slug: "guides/development/local-setup";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/faq.md": {
+	id: "guides/faq.md";
+  slug: "guides/faq";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/framework-integration/angular-integration.md": {
+	id: "guides/framework-integration/angular-integration.md";
+  slug: "guides/framework-integration/angular-integration";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/framework-integration/nextjs-integration.md": {
+	id: "guides/framework-integration/nextjs-integration.md";
+  slug: "guides/framework-integration/nextjs-integration";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/framework-integration/react-integration.md": {
+	id: "guides/framework-integration/react-integration.md";
+  slug: "guides/framework-integration/react-integration";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/framework-integration/svelte-integration.md": {
+	id: "guides/framework-integration/svelte-integration.md";
+  slug: "guides/framework-integration/svelte-integration";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/framework-integration/vue-integration.md": {
+	id: "guides/framework-integration/vue-integration.md";
+  slug: "guides/framework-integration/vue-integration";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
 "guides/howto.md": {
 	id: "guides/howto.md";
   slug: "guides/howto";
@@ -262,9 +521,65 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".md"] };
+"guides/i18n.md": {
+	id: "guides/i18n.md";
+  slug: "guides/i18n";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
 "guides/known_bugs_issues.md": {
 	id: "guides/known_bugs_issues.md";
   slug: "guides/known_bugs_issues";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/performance.md": {
+	id: "guides/performance.md";
+  slug: "guides/performance";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/recipes/add-custom-buttons.md": {
+	id: "guides/recipes/add-custom-buttons.md";
+  slug: "guides/recipes/add-custom-buttons";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/recipes/change-colors-dynamically.md": {
+	id: "guides/recipes/change-colors-dynamically.md";
+  slug: "guides/recipes/change-colors-dynamically";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/recipes/custom-tooltips.md": {
+	id: "guides/recipes/custom-tooltips.md";
+  slug: "guides/recipes/custom-tooltips";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/recipes/keyboard-shortcuts.md": {
+	id: "guides/recipes/keyboard-shortcuts.md";
+  slug: "guides/recipes/keyboard-shortcuts";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/recipes/multi-language-support.md": {
+	id: "guides/recipes/multi-language-support.md";
+  slug: "guides/recipes/multi-language-support";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/recipes/save-restore-chart-state.md": {
+	id: "guides/recipes/save-restore-chart-state.md";
+  slug: "guides/recipes/save-restore-chart-state";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
@@ -279,6 +594,13 @@ declare module 'astro:content' {
 "guides/test.md": {
 	id: "guides/test.md";
   slug: "guides/test";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"guides/testing.md": {
+	id: "guides/testing.md";
+  slug: "guides/testing";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">
@@ -332,6 +654,41 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".md"] };
+"reference/architecture/event-system.md": {
+	id: "reference/architecture/event-system.md";
+  slug: "reference/architecture/event-system";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/architecture/performance-internals.md": {
+	id: "reference/architecture/performance-internals.md";
+  slug: "reference/architecture/performance-internals";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/architecture/plugin-architecture.md": {
+	id: "reference/architecture/plugin-architecture.md";
+  slug: "reference/architecture/plugin-architecture";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/architecture/rendering-pipeline.md": {
+	id: "reference/architecture/rendering-pipeline.md";
+  slug: "reference/architecture/rendering-pipeline";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/architecture/state-management-detailed.md": {
+	id: "reference/architecture/state-management-detailed.md";
+  slug: "reference/architecture/state-management-detailed";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
 "reference/canvas_extension_layers.md": {
 	id: "reference/canvas_extension_layers.md";
   slug: "reference/canvas_extension_layers";
@@ -346,6 +703,20 @@ declare module 'astro:content' {
   collection: "docs";
   data: InferEntrySchema<"docs">
 } & { render(): Render[".md"] };
+"reference/changelog.md": {
+	id: "reference/changelog.md";
+  slug: "reference/changelog";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/dataSource.md": {
+	id: "reference/dataSource.md";
+  slug: "reference/datasource";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
 "reference/events.md": {
 	id: "reference/events.md";
   slug: "reference/events";
@@ -356,6 +727,13 @@ declare module 'astro:content' {
 "reference/example.md": {
 	id: "reference/example.md";
   slug: "reference/example";
+  body: string;
+  collection: "docs";
+  data: InferEntrySchema<"docs">
+} & { render(): Render[".md"] };
+"reference/glossary.md": {
+	id: "reference/glossary.md";
+  slug: "reference/glossary";
   body: string;
   collection: "docs";
   data: InferEntrySchema<"docs">

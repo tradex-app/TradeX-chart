@@ -1,0 +1,86 @@
+---
+title: Mobile Responsive API
+description: API reference for mobile and touch features
+---
+
+# Mobile Responsive API
+
+API reference for mobile-responsive features and touch interactions.
+
+## Touch Configuration
+
+```typescript
+interface TouchOptions {
+  enabled?: boolean
+  pinchZoom?: boolean
+  swipeScroll?: boolean
+  doubleTapZoom?: boolean
+  sensitivity?: number
+  threshold?: number
+}
+```
+
+**Example:**
+```javascript
+chart.start({
+  touch: {
+    enabled: true,
+    pinchZoom: true,
+    swipeScroll: true,
+    sensitivity: 1.0
+  }
+})
+```
+
+## Chart Methods
+
+### resize()
+
+```typescript
+chart.resize(width?: number, height?: number): void
+```
+
+**Example:**
+```javascript
+chart.resize() // Auto-resize
+chart.resize(800, 600) // Specific size
+```
+
+### isMobile()
+
+```typescript
+chart.isMobile(): boolean
+```
+
+**Example:**
+```javascript
+if (chart.isMobile()) {
+  console.log('Mobile device')
+}
+```
+
+## Touch Events
+
+### touchstart, touchmove, touchend
+
+```typescript
+chart.on('touchstart', (event: TouchEvent) => void)
+chart.on('touchmove', (event: TouchEvent) => void)
+chart.on('touchend', (event: TouchEvent) => void)
+```
+
+### pinch
+
+```typescript
+chart.on('pinch', (event: PinchEvent) => void)
+
+interface PinchEvent {
+  scale: number
+  center: { x: number, y: number }
+}
+```
+
+## Related Documentation
+
+- [Example](../examples/mobile-responsive) - Mobile example
+- [Performance](../guides/performance) - Performance optimization

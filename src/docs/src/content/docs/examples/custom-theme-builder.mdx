@@ -1,0 +1,525 @@
+---
+title: Custom Theme Builder
+description: Build and customize chart themes dynamically
+---
+
+# Custom Theme Builder
+
+Create a dynamic theme builder to customize chart appearance in real-time.
+
+## Basic Theme Structure
+
+```javascript
+const customTheme = {
+  candle: {
+    upBodyColor: '#26a69a',
+    upWickColor: '#26a69a',
+    downBodyColor: '#ef5350',
+    downWickColor: '#ef5350'
+  },
+  background: '#1e1e1e',
+  grid: {
+    color: '#2a2a2a',
+    style: 'solid'
+  },
+  xAxis: {
+    color: '#666',
+    fontSize: 12,
+    fontFamily: 'Arial'
+  },
+  yAxis: {
+    color: '#666',
+    fontSize: 12,
+    fontFamily: 'Arial'
+  },
+  crosshair: {
+    color: '#888',
+    style: 'dashed'
+  },
+  volume: {
+    upColor: 'rgba(38, 166, 154, 0.5)',
+    downColor: 'rgba(239, 83, 80, 0.5)'
+  }
+}
+
+// Apply theme
+chart.setTheme(customTheme)
+```
+
+## Theme Builder Class
+
+```javascript
+class ThemeBuilder {
+  constructor(chart) {
+    this.chart = chart
+    this.theme = this.getDefaultTheme()
+  }
+
+  getDefaultTheme() {
+    return {
+      candle: {
+        upBodyColor: '#26a69a',
+        upWickColor: '#26a69a',
+        downBodyColor: '#ef5350',
+        downWickColor: '#ef5350',
+        borderWidth: 1
+      },
+      background: '#ffffff',
+      grid: {
+        color: '#e0e0e0',
+        style: 'solid',
+        lineWidth: 1
+      },
+      xAxis: {
+        color: '#666666',
+        fontSize: 12,
+        fontFamily: 'Arial',
+        height: 30
+      },
+      yAxis: {
+        color: '#666666',
+        fontSize: 12,
+        fontFamily: 'Arial',
+        width: 80
+      },
+      crosshair: {
+        color: '#888888',
+        style: 'dashed',
+        lineWidth: 1
+      },
+      volume: {
+        upColor: 'rgba(38, 166, 154, 0.5)',
+        downColor: 'rgba(239, 83, 80, 0.5)'
+      },
+      indicators: {
+        colors: ['#2196F3', '#FF9800', '#4CAF50', '#E91E63']
+      }
+    }
+  }
+
+  set(path, value) {
+    const keys = path.split('.')
+    let obj = this.theme
+    
+    for (let i = 0; i < keys.length - 1; i++) {
+      obj = obj[keys[i]]
+    }
+    
+    obj[keys[keys.length - 1]] = value
+    this.apply()
+  }
+
+  get(path) {
+    const keys = path.split('.')
+    let obj = this.theme
+    
+    for (const key of keys) {
+      obj = obj[key]
+    }
+    
+    return obj
+  }
+
+  apply() {
+    this.chart.setTheme(this.theme)
+  }
+
+  export() {
+    return JSON.stringify(this.theme, null, 2)
+  }
+
+  import(themeJson) {
+    try {
+      this.theme = JSON.parse(themeJson)
+      this.apply()
+      return true
+    } catch (error) {
+      console.error('Invalid theme JSON:', error)
+      return false
+    }
+  }
+
+  reset() {
+    this.theme = this.getDefaultTheme()
+    this.apply()
+  }
+}
+
+// Usage
+const themeBuilder = new ThemeBuilder(chart)
+themeBuilder.set('candle.upBodyColor', '#00ff00')
+themeBuilder.set('background', '#000000')
+```
+
+## Interactive Theme Builder UI
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      display: flex;
+      height: 100vh;
+    }
+    .theme-panel {
+      width: 300px;
+      background: #f5f5f5;
+      padding: 20px;
+      overflow-y: auto;
+      border-right: 1px solid #ddd;
+    }
+    .chart-container {
+      flex: 1;
+      padding: 20px;
+    }
+    .theme-section {
+      margin-bottom: 20px;
+    }
+    .theme-section h3 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      text-transform: uppercase;
+      color: #666;
+    }
+    .theme-control {
+      margin-bottom: 10px;
+    }
+    .theme-control label {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 5px;
+      color: #333;
+    }
+    .theme-control input[type="color"],
+    .theme-control input[type="number"],
+    .theme-control select {
+      width: 100%;
+      padding: 5px;
+      border: 1px solid #ccc;
+      border-radius: 3px;
+    }
+    .theme-actions {
+      margin-top: 20px;
+      display: flex;
+      gap: 10px;
+    }
+    .theme-actions button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 3px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .btn-export {
+      background: #2196F3;
+      color: white;
+    }
+    .btn-import {
+      background: #4CAF50;
+      color: white;
+    }
+    .btn-reset {
+      background: #f44336;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <div class="theme-panel">
+    <h2>Theme Builder</h2>
+    
+    <div class="theme-section">
+      <h3>Candles</h3>
+      <div class="theme-control">
+        <label>Up Color</label>
+        <input type="color" id="candle-up-color" value="#26a69a">
+      </div>
+      <div class="theme-control">
+        <label>Down Color</label>
+        <input type="color" id="candle-down-color" value="#ef5350">
+      </div>
+      <div class="theme-control">
+        <label>Border Width</label>
+        <input type="number" id="candle-border-width" value="1" min="0" max="5">
+      </div>
+    </div>
+
+    <div class="theme-section">
+      <h3>Background</h3>
+      <div class="theme-control">
+        <label>Color</label>
+        <input type="color" id="background-color" value="#ffffff">
+      </div>
+    </div>
+
+    <div class="theme-section">
+      <h3>Grid</h3>
+      <div class="theme-control">
+        <label>Color</label>
+        <input type="color" id="grid-color" value="#e0e0e0">
+      </div>
+      <div class="theme-control">
+        <label>Style</label>
+        <select id="grid-style">
+          <option value="solid">Solid</option>
+          <option value="dashed">Dashed</option>
+          <option value="dotted">Dotted</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="theme-section">
+      <h3>Crosshair</h3>
+      <div class="theme-control">
+        <label>Color</label>
+        <input type="color" id="crosshair-color" value="#888888">
+      </div>
+      <div class="theme-control">
+        <label>Style</label>
+        <select id="crosshair-style">
+          <option value="solid">Solid</option>
+          <option value="dashed" selected>Dashed</option>
+          <option value="dotted">Dotted</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="theme-actions">
+      <button class="btn-export" onclick="exportTheme()">Export</button>
+      <button class="btn-import" onclick="importTheme()">Import</button>
+      <button class="btn-reset" onclick="resetTheme()">Reset</button>
+    </div>
+  </div>
+
+  <div class="chart-container">
+    <tradex-chart id="chart"></tradex-chart>
+  </div>
+
+  <script>
+    const chart = document.getElementById('chart')
+    const themeBuilder = new ThemeBuilder(chart)
+
+    // Setup event listeners
+    document.getElementById('candle-up-color').addEventListener('input', (e) => {
+      themeBuilder.set('candle.upBodyColor', e.target.value)
+      themeBuilder.set('candle.upWickColor', e.target.value)
+    })
+
+    document.getElementById('candle-down-color').addEventListener('input', (e) => {
+      themeBuilder.set('candle.downBodyColor', e.target.value)
+      themeBuilder.set('candle.downWickColor', e.target.value)
+    })
+
+    document.getElementById('candle-border-width').addEventListener('input', (e) => {
+      themeBuilder.set('candle.borderWidth', parseInt(e.target.value))
+    })
+
+    document.getElementById('background-color').addEventListener('input', (e) => {
+      themeBuilder.set('background', e.target.value)
+    })
+
+    document.getElementById('grid-color').addEventListener('input', (e) => {
+      themeBuilder.set('grid.color', e.target.value)
+    })
+
+    document.getElementById('grid-style').addEventListener('change', (e) => {
+      themeBuilder.set('grid.style', e.target.value)
+    })
+
+    document.getElementById('crosshair-color').addEventListener('input', (e) => {
+      themeBuilder.set('crosshair.color', e.target.value)
+    })
+
+    document.getElementById('crosshair-style').addEventListener('change', (e) => {
+      themeBuilder.set('crosshair.style', e.target.value)
+    })
+
+    function exportTheme() {
+      const themeJson = themeBuilder.export()
+      const blob = new Blob([themeJson], { type: 'application/json' })
+      const url = URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = 'chart-theme.json'
+      a.click()
+      URL.revokeObjectURL(url)
+    }
+
+    function importTheme() {
+      const input = document.createElement('input')
+      input.type = 'file'
+      input.accept = '.json'
+      input.onchange = (e) => {
+        const file = e.target.files[0]
+        const reader = new FileReader()
+        reader.onload = (event) => {
+          if (themeBuilder.import(event.target.result)) {
+            alert('Theme imported successfully!')
+            updateUIFromTheme()
+          } else {
+            alert('Failed to import theme')
+          }
+        }
+        reader.readAsText(file)
+      }
+      input.click()
+    }
+
+    function resetTheme() {
+      if (confirm('Reset theme to default?')) {
+        themeBuilder.reset()
+        updateUIFromTheme()
+      }
+    }
+
+    function updateUIFromTheme() {
+      document.getElementById('candle-up-color').value = themeBuilder.get('candle.upBodyColor')
+      document.getElementById('candle-down-color').value = themeBuilder.get('candle.downBodyColor')
+      document.getElementById('candle-border-width').value = themeBuilder.get('candle.borderWidth')
+      document.getElementById('background-color').value = themeBuilder.get('background')
+      document.getElementById('grid-color').value = themeBuilder.get('grid.color')
+      document.getElementById('grid-style').value = themeBuilder.get('grid.style')
+      document.getElementById('crosshair-color').value = themeBuilder.get('crosshair.color')
+      document.getElementById('crosshair-style').value = themeBuilder.get('crosshair.style')
+    }
+  </script>
+</body>
+</html>
+```
+
+## Preset Themes
+
+```javascript
+const presetThemes = {
+  dark: {
+    candle: {
+      upBodyColor: '#26a69a',
+      upWickColor: '#26a69a',
+      downBodyColor: '#ef5350',
+      downWickColor: '#ef5350'
+    },
+    background: '#1e1e1e',
+    grid: { color: '#2a2a2a', style: 'solid' },
+    xAxis: { color: '#888', fontSize: 12 },
+    yAxis: { color: '#888', fontSize: 12 },
+    crosshair: { color: '#666', style: 'dashed' }
+  },
+  
+  light: {
+    candle: {
+      upBodyColor: '#4caf50',
+      upWickColor: '#4caf50',
+      downBodyColor: '#f44336',
+      downWickColor: '#f44336'
+    },
+    background: '#ffffff',
+    grid: { color: '#e0e0e0', style: 'solid' },
+    xAxis: { color: '#333', fontSize: 12 },
+    yAxis: { color: '#333', fontSize: 12 },
+    crosshair: { color: '#999', style: 'dashed' }
+  },
+  
+  tradingView: {
+    candle: {
+      upBodyColor: '#089981',
+      upWickColor: '#089981',
+      downBodyColor: '#f23645',
+      downWickColor: '#f23645'
+    },
+    background: '#131722',
+    grid: { color: '#1e222d', style: 'solid' },
+    xAxis: { color: '#787b86', fontSize: 11 },
+    yAxis: { color: '#787b86', fontSize: 11 },
+    crosshair: { color: '#9598a1', style: 'dashed' }
+  }
+}
+
+// Apply preset
+chart.setTheme(presetThemes.dark)
+```
+
+## React Theme Builder Component
+
+```jsx
+import { useState } from 'react'
+
+function ThemeBuilder({ chart }) {
+  const [theme, setTheme] = useState({
+    candleUpColor: '#26a69a',
+    candleDownColor: '#ef5350',
+    background: '#ffffff',
+    gridColor: '#e0e0e0'
+  })
+
+  const updateTheme = (key, value) => {
+    const newTheme = { ...theme, [key]: value }
+    setTheme(newTheme)
+    
+    // Apply to chart
+    chart.setTheme({
+      candle: {
+        upBodyColor: newTheme.candleUpColor,
+        upWickColor: newTheme.candleUpColor,
+        downBodyColor: newTheme.candleDownColor,
+        downWickColor: newTheme.candleDownColor
+      },
+      background: newTheme.background,
+      grid: { color: newTheme.gridColor }
+    })
+  }
+
+  return (
+    <div className="theme-builder">
+      <h3>Theme Builder</h3>
+      
+      <div>
+        <label>Candle Up Color</label>
+        <input
+          type="color"
+          value={theme.candleUpColor}
+          onChange={(e) => updateTheme('candleUpColor', e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label>Candle Down Color</label>
+        <input
+          type="color"
+          value={theme.candleDownColor}
+          onChange={(e) => updateTheme('candleDownColor', e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label>Background</label>
+        <input
+          type="color"
+          value={theme.background}
+          onChange={(e) => updateTheme('background', e.target.value)}
+        />
+      </div>
+
+      <div>
+        <label>Grid Color</label>
+        <input
+          type="color"
+          value={theme.gridColor}
+          onChange={(e) => updateTheme('gridColor', e.target.value)}
+        />
+      </div>
+    </div>
+  )
+}
+
+export default ThemeBuilder
+```
+
+## Related Documentation
+
+- [API Reference](../api/custom-theme-builder) - Theme API
+- [Configuration](../reference/02_configuration) - Theme configuration
+- [Examples](../examples) - More examples

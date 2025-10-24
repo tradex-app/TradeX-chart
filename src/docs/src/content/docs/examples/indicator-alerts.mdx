@@ -1,0 +1,616 @@
+---
+title: Indicator Alerts
+description: Set up alerts based on indicator conditions
+---
+
+# Indicator Alerts
+
+Create custom alerts triggered by indicator conditions like RSI overbought/oversold, MACD crossovers, and price levels.
+
+## Basic Alert System
+
+```javascript
+class AlertManager {
+  constructor(chart) {
+    this.chart = chart
+    this.alerts = []
+    this.activeAlerts = new Set()
+  }
+
+  addAlert(config) {
+    const alert = {
+      id: `alert_${Date.now()}`,
+      ...config,
+      triggered: false
+    }
+    
+    this.alerts.push(alert)
+    return alert.id
+  }
+
+  checkAlerts(data) {
+    this.alerts.forEach(alert => {
+      if (!alert.triggered && this.evaluateCondition(alert, data)) {
+        this.triggerAlert(alert)
+      }
+    })
+  }
+
+  evaluateCondition(alert, data) {
+    const { type, indicator, condition, value } = alert
+    
+    switch (type) {
+      case 'indicator':
+        return this.checkIndicatorCondition(indicator, condition, value, data)
+      case 'price':
+        return this.checkPriceCondition(condition, value, data)
+      default:
+        return false
+    }
+  }
+
+  checkIndicatorCondition(indicator, condition, value, data) {
+    const indicatorValue = this.getIndicatorValue(indicator, data)
+    
+    switch (condition) {
+      case 'above':
+        return indicatorValue > value
+      case 'below':
+        return indicatorValue < value
+      case 'crosses_above':
+        return this.checkCrossAbove(indicator, value, data)
+      case 'crosses_below':
+        return this.checkCrossBelow(indicator, value, data)
+      default:
+        return false
+    }
+  }
+
+  triggerAlert(alert) {
+    alert.triggered = true
+    this.activeAlerts.add(alert.id)
+    
+    // Execute callback
+    if (alert.onTrigger) {
+      alert.onTrigger(alert)
+    }
+    
+    // Show notification
+    this.showNotification(alert)
+    
+    // Play sound
+    if (alert.sound) {
+      this.playSound(alert.sound)
+    }
+  }
+
+  showNotification(alert) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Chart Alert', {
+        body: alert.message,
+        icon: '/chart-icon.png'
+      })
+    }
+  }
+
+  playSound(soundUrl) {
+    const audio = new Audio(soundUrl)
+    audio.play()
+  }
+
+  removeAlert(id) {
+    this.alerts = this.alerts.filter(a => a.id !== id)
+    this.activeAlerts.delete(id)
+  }
+
+  clearAll() {
+    this.alerts = []
+    this.activeAlerts.clear()
+  }
+}
+
+// Usage
+const alertManager = new AlertManager(chart)
+
+alertManager.addAlert({
+  type: 'indicator',
+  indicator: 'RSI',
+  condition: 'above',
+  value: 70,
+  message: 'RSI is overbought!',
+  sound: '/alert.mp3',
+  onTrigger: (alert) => {
+    console.log('Alert triggered:', alert)
+  }
+})
+```
+
+## RSI Alerts
+
+```javascript
+class RSIAlertSystem {
+  constructor(chart, period = 14) {
+    this.chart = chart
+    this.period = period
+    this.overboughtLevel = 70
+    this.oversoldLevel = 30
+    this.lastRSI = null
+  }
+
+  checkAlerts() {
+    const rsi = this.calculateRSI()
+    
+    if (rsi > this.overboughtLevel && this.lastRSI <= this.overboughtLevel) {
+      this.triggerAlert('overbought', rsi)
+    }
+    
+    if (rsi < this.oversoldLevel && this.lastRSI >= this.oversoldLevel) {
+      this.triggerAlert('oversold', rsi)
+    }
+    
+    this.lastRSI = rsi
+  }
+
+  calculateRSI() {
+    const data = this.chart.getData()
+    const closes = data.slice(-this.period - 1).map(c => c[4])
+    
+    let gains = 0
+    let losses = 0
+    
+    for (let i = 1; i < closes.length; i++) {
+      const change = closes[i] - closes[i - 1]
+      if (change > 0) {
+        gains += change
+      } else {
+        losses += Math.abs(change)
+      }
+    }
+    
+    const avgGain = gains / this.period
+    const avgLoss = losses / this.period
+    
+    if (avgLoss === 0) return 100
+    
+    const rs = avgGain / avgLoss
+    return 100 - (100 / (1 + rs))
+  }
+
+  triggerAlert(type, value) {
+    const message = type === 'overbought' 
+      ? `RSI is overbought at ${value.toFixed(2)}`
+      : `RSI is oversold at ${value.toFixed(2)}`
+    
+    this.showNotification(message)
+    this.playSound()
+  }
+
+  showNotification(message) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('RSI Alert', { body: message })
+    } else {
+      alert(message)
+    }
+  }
+
+  playSound() {
+    const audio = new Audio('/alert.mp3')
+    audio.play().catch(e => console.log('Could not play sound'))
+  }
+}
+
+// Usage
+const rsiAlerts = new RSIAlertSystem(chart, 14)
+
+// Check on every update
+chart.on('update', () => {
+  rsiAlerts.checkAlerts()
+})
+```
+
+## MACD Crossover Alerts
+
+```javascript
+class MACDAlertSystem {
+  constructor(chart) {
+    this.chart = chart
+    this.lastMACD = null
+    this.lastSignal = null
+  }
+
+  checkCrossover() {
+    const { macd, signal } = this.calculateMACD()
+    
+    if (this.lastMACD !== null && this.lastSignal !== null) {
+      // Bullish crossover
+      if (macd > signal && this.lastMACD <= this.lastSignal) {
+        this.triggerAlert('bullish', macd, signal)
+      }
+      
+      // Bearish crossover
+      if (macd < signal && this.lastMACD >= this.lastSignal) {
+        this.triggerAlert('bearish', macd, signal)
+      }
+    }
+    
+    this.lastMACD = macd
+    this.lastSignal = signal
+  }
+
+  calculateMACD() {
+    // Simplified MACD calculation
+    const data = this.chart.getData()
+    const closes = data.map(c => c[4])
+    
+    const ema12 = this.calculateEMA(closes, 12)
+    const ema26 = this.calculateEMA(closes, 26)
+    const macd = ema12 - ema26
+    
+    // Signal line (9-period EMA of MACD)
+    const signal = this.calculateEMA([macd], 9)
+    
+    return { macd, signal }
+  }
+
+  calculateEMA(data, period) {
+    const k = 2 / (period + 1)
+    let ema = data[0]
+    
+    for (let i = 1; i < data.length; i++) {
+      ema = data[i] * k + ema * (1 - k)
+    }
+    
+    return ema
+  }
+
+  triggerAlert(type, macd, signal) {
+    const message = type === 'bullish'
+      ? `Bullish MACD crossover detected`
+      : `Bearish MACD crossover detected`
+    
+    this.showNotification(message, type)
+  }
+
+  showNotification(message, type) {
+    const color = type === 'bullish' ? '#4CAF50' : '#f44336'
+    
+    // Browser notification
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('MACD Alert', {
+        body: message,
+        icon: '/chart-icon.png'
+      })
+    }
+    
+    // Visual alert on chart
+    this.chart.showAlert(message, color)
+  }
+}
+
+// Usage
+const macdAlerts = new MACDAlertSystem(chart)
+
+chart.on('update', () => {
+  macdAlerts.checkCrossover()
+})
+```
+
+## Price Level Alerts
+
+```javascript
+class PriceLevelAlerts {
+  constructor(chart) {
+    this.chart = chart
+    this.levels = []
+  }
+
+  addLevel(price, type = 'both') {
+    const level = {
+      id: `level_${Date.now()}`,
+      price,
+      type, // 'above', 'below', or 'both'
+      triggered: false
+    }
+    
+    this.levels.push(level)
+    
+    // Draw level on chart
+    this.chart.addLine({
+      price: price,
+      color: '#FFA500',
+      style: 'dashed',
+      label: `Alert: ${price}`
+    })
+    
+    return level.id
+  }
+
+  checkLevels() {
+    const currentPrice = this.chart.getCurrentPrice()
+    
+    this.levels.forEach(level => {
+      if (level.triggered) return
+      
+      const crossed = this.checkCross(level, currentPrice)
+      
+      if (crossed) {
+        this.triggerAlert(level, currentPrice)
+      }
+    })
+  }
+
+  checkCross(level, currentPrice) {
+    if (level.type === 'above' && currentPrice >= level.price) {
+      return true
+    }
+    if (level.type === 'below' && currentPrice <= level.price) {
+      return true
+    }
+    if (level.type === 'both') {
+      return Math.abs(currentPrice - level.price) < 0.01
+    }
+    return false
+  }
+
+  triggerAlert(level, currentPrice) {
+    level.triggered = true
+    
+    const message = `Price crossed ${level.price} (Current: ${currentPrice})`
+    
+    this.showNotification(message)
+    this.highlightLevel(level)
+  }
+
+  showNotification(message) {
+    if ('Notification' in window && Notification.permission === 'granted') {
+      new Notification('Price Alert', { body: message })
+    }
+  }
+
+  highlightLevel(level) {
+    this.chart.updateLine(level.id, {
+      color: '#FF0000',
+      width: 2
+    })
+  }
+
+  removeLevel(id) {
+    this.levels = this.levels.filter(l => l.id !== id)
+    this.chart.removeLine(id)
+  }
+}
+
+// Usage
+const priceAlerts = new PriceLevelAlerts(chart)
+
+priceAlerts.addLevel(50000, 'above')
+priceAlerts.addLevel(45000, 'below')
+
+chart.on('update', () => {
+  priceAlerts.checkLevels()
+})
+```
+
+## Complete Alert UI
+
+```html
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    .alert-panel {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 300px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      padding: 20px;
+    }
+    .alert-form {
+      margin-bottom: 20px;
+    }
+    .alert-form select,
+    .alert-form input {
+      width: 100%;
+      padding: 8px;
+      margin: 5px 0;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    .alert-form button {
+      width: 100%;
+      padding: 10px;
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .alert-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+    .alert-item {
+      padding: 10px;
+      margin: 5px 0;
+      background: #f5f5f5;
+      border-radius: 4px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .alert-item.triggered {
+      background: #ffebee;
+    }
+    .alert-remove {
+      color: #f44336;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="alert-panel">
+    <h3>Alerts</h3>
+    
+    <div class="alert-form">
+      <select id="alert-type">
+        <option value="rsi">RSI</option>
+        <option value="macd">MACD</option>
+        <option value="price">Price Level</option>
+      </select>
+      
+      <input type="number" id="alert-value" placeholder="Value">
+      
+      <select id="alert-condition">
+        <option value="above">Above</option>
+        <option value="below">Below</option>
+        <option value="crosses_above">Crosses Above</option>
+        <option value="crosses_below">Crosses Below</option>
+      </select>
+      
+      <button onclick="addAlert()">Add Alert</button>
+    </div>
+    
+    <div class="alert-list" id="alert-list"></div>
+  </div>
+
+  <tradex-chart id="chart"></tradex-chart>
+
+  <script>
+    const chart = document.getElementById('chart')
+    const alertManager = new AlertManager(chart)
+
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+
+    function addAlert() {
+      const type = document.getElementById('alert-type').value
+      const value = parseFloat(document.getElementById('alert-value').value)
+      const condition = document.getElementById('alert-condition').value
+
+      const id = alertManager.addAlert({
+        type: 'indicator',
+        indicator: type.toUpperCase(),
+        condition,
+        value,
+        message: `${type.toUpperCase()} ${condition} ${value}`,
+        sound: '/alert.mp3',
+        onTrigger: (alert) => {
+          updateAlertList()
+        }
+      })
+
+      updateAlertList()
+    }
+
+    function updateAlertList() {
+      const list = document.getElementById('alert-list')
+      list.innerHTML = ''
+
+      alertManager.alerts.forEach(alert => {
+        const item = document.createElement('div')
+        item.className = `alert-item ${alert.triggered ? 'triggered' : ''}`
+        item.innerHTML = `
+          <span>${alert.message}</span>
+          <span class="alert-remove" onclick="removeAlert('${alert.id}')">×</span>
+        `
+        list.appendChild(item)
+      })
+    }
+
+    function removeAlert(id) {
+      alertManager.removeAlert(id)
+      updateAlertList()
+    }
+
+    // Check alerts on every update
+    chart.on('update', () => {
+      const data = chart.getData()
+      alertManager.checkAlerts(data)
+    })
+  </script>
+</body>
+</html>
+```
+
+## React Alert Component
+
+```jsx
+import { useState, useEffect } from 'react'
+
+function AlertPanel({ chart }) {
+  const [alerts, setAlerts] = useState([])
+  const [newAlert, setNewAlert] = useState({
+    type: 'rsi',
+    condition: 'above',
+    value: 70
+  })
+
+  useEffect(() => {
+    // Request notification permission
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission()
+    }
+  }, [])
+
+  const addAlert = () => {
+    const alert = {
+      id: Date.now(),
+      ...newAlert,
+      triggered: false
+    }
+    
+    setAlerts([...alerts, alert])
+  }
+
+  const removeAlert = (id) => {
+    setAlerts(alerts.filter(a => a.id !== id))
+  }
+
+  return (
+    <div className="alert-panel">
+      <h3>Alerts</h3>
+      
+      <div className="alert-form">
+        <select 
+          value={newAlert.type}
+          onChange={(e) => setNewAlert({...newAlert, type: e.target.value})}
+        >
+          <option value="rsi">RSI</option>
+          <option value="macd">MACD</option>
+          <option value="price">Price</option>
+        </select>
+        
+        <input
+          type="number"
+          value={newAlert.value}
+          onChange={(e) => setNewAlert({...newAlert, value: e.target.value})}
+        />
+        
+        <button onClick={addAlert}>Add Alert</button>
+      </div>
+      
+      <div className="alert-list">
+        {alerts.map(alert => (
+          <div key={alert.id} className={`alert-item ${alert.triggered ? 'triggered' : ''}`}>
+            <span>{alert.type} {alert.condition} {alert.value}</span>
+            <button onClick={() => removeAlert(alert.id)}>×</button>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default AlertPanel
+```
+
+## Related Documentation
+
+- [API Reference](../api/indicator-alerts) - Alert API
+- [Indicators](../guides/indicators) - Indicator guide
+- [Events](../reference/events) - Chart events
