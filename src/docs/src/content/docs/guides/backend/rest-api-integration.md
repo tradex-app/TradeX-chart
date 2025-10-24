@@ -3,8 +3,6 @@ title: REST API Integration
 description: Integrating TradeX Chart with REST API backends
 ---
 
-# REST API Integration
-
 Learn how to integrate TradeX Chart with REST API backends for fetching historical and real-time market data.
 
 ## Overview

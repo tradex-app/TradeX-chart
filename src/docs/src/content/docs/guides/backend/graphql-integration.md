@@ -3,8 +3,6 @@ title: GraphQL Integration
 description: Fetching chart data using GraphQL APIs
 ---
 
-# GraphQL Integration
-
 Learn how to integrate TradeX Chart with GraphQL backends for flexible and efficient data fetching.
 
 ## Overview

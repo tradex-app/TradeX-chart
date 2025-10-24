@@ -3,8 +3,6 @@ title: Change Colors Dynamically
 description: Dynamically change chart colors and themes
 ---
 
-# Change Colors Dynamically
-
 Dynamically update chart colors and themes at runtime.
 
 ## Change Candle Colors

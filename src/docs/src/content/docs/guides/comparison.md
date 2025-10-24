@@ -3,8 +3,6 @@ title: Library Comparison
 description: How TradeX Chart compares to other charting solutions
 ---
 
-# TradeX Chart vs Other Charting Libraries
-
 This guide helps you understand how TradeX Chart compares to other popular financial charting libraries and when to choose each solution.
 
 ## Quick Comparison Table

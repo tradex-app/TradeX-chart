@@ -3,8 +3,6 @@ title: State Management
 description: TradeX Chart state management architecture
 ---
 
-# State Management
-
 TradeX Chart uses a centralized state management system with reactive updates.
 
 ## State Architecture

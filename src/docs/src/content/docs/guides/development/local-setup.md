@@ -3,8 +3,6 @@ title: Local Development Setup
 description: Set up your local environment for TradeX Chart development
 ---
 
-# Local Development Setup
-
 Get your local environment ready for contributing to or customizing TradeX Chart.
 
 ## Prerequisites

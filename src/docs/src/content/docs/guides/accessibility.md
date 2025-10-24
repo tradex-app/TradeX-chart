@@ -3,8 +3,6 @@ title: Accessibility
 description: Making TradeX Chart accessible to all users
 ---
 
-# Accessibility
-
 Make your TradeX Chart accessible to users with disabilities.
 
 ## ARIA Labels

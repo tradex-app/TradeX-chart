@@ -3,8 +3,6 @@ title: Production Checklist
 description: Essential checklist for deploying TradeX Chart to production
 ---
 
-# Production Checklist
-
 Essential checklist to ensure your TradeX Chart deployment is production-ready.
 
 ## Pre-Deployment

@@ -3,8 +3,6 @@ title: Testing
 description: Testing strategies for TradeX Chart applications
 ---
 
-# Testing TradeX Chart
-
 Comprehensive testing guide for applications using TradeX Chart.
 
 ## Unit Testing

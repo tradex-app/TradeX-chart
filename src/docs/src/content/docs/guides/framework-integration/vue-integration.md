@@ -3,8 +3,6 @@ title: Vue Integration
 description: Integrate TradeX Chart with Vue.js applications
 ---
 
-# Vue Integration
-
 Learn how to integrate TradeX Chart into your Vue.js applications (Vue 3).
 
 ## Installation

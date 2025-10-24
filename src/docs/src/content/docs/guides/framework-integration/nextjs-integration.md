@@ -3,8 +3,6 @@ title: Next.js Integration
 description: Integrate TradeX Chart with Next.js applications
 ---
 
-# Next.js Integration
-
 Learn how to integrate TradeX Chart into your Next.js applications (App Router and Pages Router).
 
 ## Installation

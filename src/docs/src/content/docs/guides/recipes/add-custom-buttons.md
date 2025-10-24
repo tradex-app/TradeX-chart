@@ -3,8 +3,6 @@ title: Add Custom Buttons
 description: Add custom buttons and controls to your chart
 ---
 
-# Add Custom Buttons
-
 Add custom buttons and controls to enhance chart functionality.
 
 ## Basic Button

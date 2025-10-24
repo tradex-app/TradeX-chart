@@ -3,8 +3,6 @@ title: Repurpose Indicators
 description: Reusing indicator classes to build custom composite indicators
 ---
 
-# Repurpose Indicators
-
 The chart's built-in indicators can be reused to build your own custom composite indicators.
 
 ## Overview

@@ -3,8 +3,6 @@ title: Frequently Asked Questions
 description: Common questions and answers about TradeX Chart
 ---
 
-# Frequently Asked Questions (FAQ)
-
 Find answers to common questions about TradeX Chart.
 
 ## General Questions

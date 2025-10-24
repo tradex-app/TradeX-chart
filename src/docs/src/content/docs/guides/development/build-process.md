@@ -3,8 +3,6 @@ title: Build Process
 description: Understanding the TradeX Chart build system and configuration
 ---
 
-# Build Process
-
 Learn how TradeX Chart is built, bundled, and optimized for distribution.
 
 ## Build System Overview

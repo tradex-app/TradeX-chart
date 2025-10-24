@@ -3,8 +3,6 @@ title: Rendering Pipeline
 description: Understanding TradeX Chart's rendering architecture
 ---
 
-# Rendering Pipeline
-
 TradeX Chart uses a multi-layered canvas rendering pipeline optimized for performance.
 
 ## Architecture Overview

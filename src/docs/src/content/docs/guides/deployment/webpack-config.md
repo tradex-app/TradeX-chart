@@ -3,8 +3,6 @@ title: Webpack Configuration
 description: Configure Webpack for optimal TradeX Chart builds
 ---
 
-# Webpack Configuration
-
 Optimize your Webpack configuration for building applications with TradeX Chart.
 
 ## Basic Configuration

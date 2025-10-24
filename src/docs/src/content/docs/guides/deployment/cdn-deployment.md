@@ -3,8 +3,6 @@ title: CDN Deployment
 description: Deploy TradeX Chart via CDN for optimal performance
 ---
 
-# CDN Deployment
-
 Learn how to deploy and use TradeX Chart via Content Delivery Networks (CDN) for optimal performance and global availability.
 
 ## Quick Start

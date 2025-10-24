@@ -3,8 +3,6 @@ title: Data Caching Strategies
 description: Optimize performance and reduce API calls with effective caching strategies
 ---
 
-# Data Caching Strategies
-
 Learn how to implement effective caching strategies to improve TradeX Chart performance, reduce API calls, and provide a better user experience.
 
 ## Overview

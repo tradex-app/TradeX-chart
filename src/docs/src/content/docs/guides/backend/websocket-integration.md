@@ -3,8 +3,6 @@ title: WebSocket Integration
 description: Real-time data streaming with WebSocket connections
 ---
 
-# WebSocket Integration
-
 Learn how to integrate real-time market data into TradeX Chart using WebSocket connections for live price updates.
 
 ## Overview

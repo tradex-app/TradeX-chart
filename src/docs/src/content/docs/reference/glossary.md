@@ -3,8 +3,6 @@ title: Glossary
 description: Common terms and definitions used in TradeX Chart
 ---
 
-# Glossary
-
 A comprehensive guide to terminology used in TradeX Chart and financial charting.
 
 ## A

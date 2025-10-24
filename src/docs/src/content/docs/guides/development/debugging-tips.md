@@ -3,8 +3,6 @@ title: Debugging Tips
 description: Techniques and tools for debugging TradeX Chart
 ---
 
-# Debugging Tips
-
 Master debugging techniques to efficiently troubleshoot and fix issues in TradeX Chart.
 
 ## Browser DevTools

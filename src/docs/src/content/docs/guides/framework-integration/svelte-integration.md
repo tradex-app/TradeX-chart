@@ -3,8 +3,6 @@ title: Svelte Integration
 description: Integrate TradeX Chart with Svelte applications
 ---
 
-# Svelte Integration
-
 Learn how to integrate TradeX Chart into your Svelte applications.
 
 ## Installation

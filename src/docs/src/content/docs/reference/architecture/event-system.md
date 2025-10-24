@@ -3,8 +3,6 @@ title: Event System
 description: TradeX Chart event-driven architecture
 ---
 
-# Event System
-
 TradeX Chart uses an event-driven architecture for component communication and user interactions.
 
 ## Event Bus

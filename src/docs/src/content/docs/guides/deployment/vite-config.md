@@ -3,8 +3,6 @@ title: Vite Configuration
 description: Configure Vite for fast TradeX Chart development and builds
 ---
 
-# Vite Configuration
-
 Optimize your Vite configuration for blazing-fast development and production builds with TradeX Chart.
 
 ## Basic Configuration

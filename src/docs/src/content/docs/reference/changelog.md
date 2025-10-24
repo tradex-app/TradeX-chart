@@ -3,8 +3,6 @@ title: Changelog
 description: Version history and release notes for TradeX Chart
 ---
 
-# Changelog
-
 Track the evolution of TradeX Chart through our version history and release notes.
 
 ## Current Version

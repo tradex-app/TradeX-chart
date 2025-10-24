@@ -3,8 +3,6 @@ title: Data Management
 description: Managing chart data efficiently in TradeX Chart
 ---
 
-# Data Management
-
 Learn how to efficiently manage, load, and update chart data in TradeX Chart.
 
 ## Data Format

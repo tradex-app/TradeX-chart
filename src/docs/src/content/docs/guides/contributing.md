@@ -3,8 +3,6 @@ title: Contributing to TradeX Chart
 description: How to contribute to the TradeX Chart project
 ---
 
-# Contributing to TradeX Chart
-
 We welcome contributions from the community! This guide will help you get started.
 
 ## Ways to Contribute

@@ -3,8 +3,6 @@ title: Performance Internals
 description: TradeX Chart performance optimization techniques
 ---
 
-# Performance Internals
-
 Deep dive into TradeX Chart's performance optimizations.
 
 ## Memory Management

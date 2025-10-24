@@ -3,8 +3,6 @@ title: Custom Tooltips
 description: Create custom tooltips for chart data
 ---
 
-# Custom Tooltips
-
 Create custom tooltips to display chart data on hover.
 
 ## Basic Tooltip

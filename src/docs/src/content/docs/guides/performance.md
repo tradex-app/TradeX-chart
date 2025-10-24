@@ -3,8 +3,6 @@ title: Performance Optimization
 description: Optimize TradeX Chart for maximum performance
 ---
 
-# Performance Optimization
-
 Learn how to optimize TradeX Chart for maximum performance and smooth rendering.
 
 ## Data Optimization

@@ -3,8 +3,6 @@ title: Angular Integration
 description: Integrate TradeX Chart with Angular applications
 ---
 
-# Angular Integration
-
 Learn how to integrate TradeX Chart into your Angular applications.
 
 ## Installation

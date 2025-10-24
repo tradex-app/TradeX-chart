@@ -3,8 +3,6 @@ title: Contributing Code
 description: Guidelines for contributing code to TradeX Chart
 ---
 
-# Contributing Code
-
 Thank you for considering contributing to TradeX Chart! This guide will help you make effective contributions.
 
 ## Getting Started

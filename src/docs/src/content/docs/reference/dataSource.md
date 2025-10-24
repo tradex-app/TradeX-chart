@@ -3,8 +3,6 @@ title: Data Source
 description: Managing data flow for TradeX charts
 ---
 
-# DataSource
-
 The `DataSource` class manages data flow for TradeX charts in an agnostic manner, implementing a pull-based architecture where charts request data rather than having data pushed to them.
 
 ## Overview

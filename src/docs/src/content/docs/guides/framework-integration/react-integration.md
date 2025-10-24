@@ -3,8 +3,6 @@ title: React Integration
 description: Integrate TradeX Chart with React applications
 ---
 
-# React Integration
-
 Learn how to integrate TradeX Chart into your React applications.
 
 ## Installation

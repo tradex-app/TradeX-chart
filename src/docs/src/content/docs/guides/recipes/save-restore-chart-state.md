@@ -3,9 +3,7 @@ title: Save & Restore Chart State
 description: Save and restore chart state across sessions
 ---
 
-# Save & Restore Chart State
-
-Persist chart configuration and state across browser sessions.
+Persist chart configuration and restore it across sessions.
 
 ## Save State to LocalStorage
 

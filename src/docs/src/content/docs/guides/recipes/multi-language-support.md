@@ -3,8 +3,6 @@ title: Multi-Language Support
 description: Add internationalization to your chart
 ---
 
-# Multi-Language Support
-
 Implement multi-language support (i18n) for your chart application.
 
 ## Basic i18n
