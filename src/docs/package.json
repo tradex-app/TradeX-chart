@@ -1,27 +1,18 @@
 {
-  "name": "tradex-chart-docs",
+  "name": "tradex-chart",
   "type": "module",
-  "version": "0.158.6",
-  "description": "Documentation for TradeX Chart - A highly customizable lightweight financial chart",
-  "author": "TradeX",
-  "license": "GNU GPL3",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tradex-app/TradeX-chart.git",
-    "directory": "src/docs"
-  },
+  "version": "0.0.1",
   "scripts": {
     "dev": "astro dev --port 3002",
     "start": "astro dev --port 3002",
-    "build": "astro build && rm -rf ../../docs && cp -r ./dist ../../docs",
-    "build:github": "astro build --config astro.config.github.mjs && rm -rf ../../docs && cp -r ./dist ../../docs",
+    "build": "astro build --config astro.config.github.mjs && rm -rf ../../docs && cp -RT ./dist2 ../../docs ",
     "test": "astro build",
     "preview": "astro preview --port 3002",
     "astro": "astro"
   },
   "dependencies": {
-    "@astrojs/starlight": "^0.28.0",
-    "astro": "^4.16.0",
-    "sharp": "^0.33.0"
+    "@astrojs/starlight": "^0.11.1",
+    "astro": "^3.3.0",
+    "sharp": "^0.32.1"
   }
 }
