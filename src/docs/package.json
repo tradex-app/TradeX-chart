@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "astro dev --port 3002",
     "start": "astro dev --port 3002",
-    "build": "astro build --config astro.config.github.mjs && rm -rf ../../docs && cp -RT ./dist2 ../../docs ",
+    "build": "astro build --config astro.config.github.mjs && rm -rf ../../docs && cp -RT ./dist2 ../../docs && touch ../../docs/.nojekyll",
     "test": "astro build",
     "preview": "astro preview --port 3002",
     "astro": "astro"
