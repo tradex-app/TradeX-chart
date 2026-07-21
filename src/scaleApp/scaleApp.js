@@ -579,7 +579,7 @@ Copyright (c) 2011-2014 Markus Kohlhase <mail@markus-kohlhase.de>
             }
             return _results;
           })();
-          e = new Error("errors occoured in the following modules: " + mdls);
+          e = new Error("errors occurred in the following modules: " + mdls);
         }
         return typeof cb === "function" ? cb(e) : void 0;
       };
