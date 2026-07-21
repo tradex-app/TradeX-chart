@@ -214,7 +214,7 @@ Copyright (c) 2012 - 2014 Markus Kohlhase <mail@markus-kohlhase.de>
       switch (status) {
         case s.ERROR:
           resetPlugin();
-          return mediator.emit("error", "an error occoured");
+          return mediator.emit("error", "an error occurred");
         case s.CONNECTING:
           resetPlugin();
           return mediator.emit("connecting");
