@@ -220,8 +220,8 @@ export default class tradeXChart extends element {
 
   setWidthMin(w) { this.style.minWidth = `var(--txc-min-width, ${w})` }
   setHeightMin(h) { this.style.minHeight = `var(--txc-min-height, ${h})` }
-  setWidthMax(w) { this.style.minWidth = `var(--txc-max-width, ${w})` }
-  setHeightMax(h) { this.style.minHeight = `var(--txc-max-height, ${h})` }
+  setWidthMax(w) { this.style.maxWidth = `var(--txc-max-width, ${w})` }
+  setHeightMax(h) { this.style.maxHeight = `var(--txc-max-height, ${h})` }
 
   /**
    * Set chart width and height
@@ -270,9 +270,9 @@ export default class tradeXChart extends element {
 
   setUtilsLocation(pos=this.#theme?.utils?.location) {
     this.#theme.utils = this.#theme?.utils || {}
-    const utilsH = (isNumber(this.#theme.uitils?.height) && 
+    const utilsH = (isNumber(this.#theme.utils?.height) && 
                     this.#theme.utils.height > 0) ? 
-                    this.#theme.uitils.height :
+                    this.#theme.utils.height :
                     UTILSH;
     switch(pos) {
       case "top":
